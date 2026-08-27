@@ -1,4 +1,4 @@
-#✨ StarlightDLC-Scr (Minecraft 1.21.4)
+#✨ StarlightDLC-Src (Minecraft 1.21.4)
 
 ![Minecraft 1.21.4](https://img.shields.io/badge/Minecraft-1.21.4-blue)
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-orange)
