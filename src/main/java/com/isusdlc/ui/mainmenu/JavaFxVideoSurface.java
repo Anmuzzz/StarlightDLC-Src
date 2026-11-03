@@ -44,8 +44,13 @@ public final class JavaFxVideoSurface {
                 Class.forName("javafx.embed.swing.JFXPanel");
                 Class.forName("javafx.scene.web.WebView");
                 available = true;
+                System.out.println("[YouTube] JavaFX найден — встроенный плеер доступен");
             } catch (Throwable throwable) {
                 available = false;
+                System.out.println("[YouTube] JavaFX НЕ найден: " + throwable.getClass().getSimpleName()
+                    + ": " + throwable.getMessage()
+                    + " | Java: " + System.getProperty("java.version")
+                    + " (" + System.getProperty("java.vendor") + ")");
             }
         }
         return available;
