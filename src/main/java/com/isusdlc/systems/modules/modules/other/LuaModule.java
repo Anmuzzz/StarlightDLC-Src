@@ -22,14 +22,12 @@ public class LuaModule extends BaseModule {
     private final BooleanSetting autoLoad =
         new BooleanSetting(this, "Auto Load", () -> false).enabled(true);
 
+    private final ButtonSetting openIde =
+        new ButtonSetting(this, "IDE", () -> false).action(() ->
+            mc.setScreen(new com.isusdlc.ui.mainmenu.LuaScriptScreen()));
+
     private final ButtonSetting reloadScripts =
-        new ButtonSetting(this, "Reload Scripts", () -> false).action(() -> {
-            if (this.engine != null) {
-                this.engine.reloadAllScripts();
-                elegant.getInstance().getNotificationManager()
-                    .addNotification(NotificationType.INFO, "Lua: scripts reloaded");
-            }
-        });
+        new ButtonSetting(this, "Reload Scripts", () -> false).action(this::reloadScripts);
 
     private final ButtonSetting openFolder =
         new ButtonSetting(this, "Open Scripts Folder", () -> false).action(() -> {
@@ -49,6 +47,10 @@ public class LuaModule extends BaseModule {
         if (!this.autoLoad.isEnabled()) {
             return;
         }
+        this.startEngine();
+    }
+
+    private void startEngine() {
         if (this.engine != null) {
             this.engine.shutdown();
         }
@@ -57,6 +59,17 @@ public class LuaModule extends BaseModule {
         elegant.getInstance().getNotificationManager()
             .addNotification(NotificationType.SUCCESS,
                 "Lua: loaded " + this.engine.getLoadedScripts().size() + " script(s)");
+    }
+
+    /** Перезагружает скрипты, создавая движок при необходимости. */
+    public void reloadScripts() {
+        if (this.engine == null) {
+            this.engine = new LuaScriptEngine();
+        }
+        this.engine.reloadAllScripts();
+        elegant.getInstance().getNotificationManager()
+            .addNotification(NotificationType.INFO,
+                "Lua: reloaded " + this.engine.getLoadedScripts().size() + " script(s)");
     }
 
     @Override
