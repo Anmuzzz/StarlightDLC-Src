@@ -197,15 +197,15 @@ public class ParticleUtil {
                + this.velocity.z * this.velocity.z;
             if (velMagSq > 1.0E-4) {
                if (this.isBlockSolid(this.position.x, this.position.y, this.position.z + this.velocity.z)) {
-                  this.velocity = new Vec3d(this.velocity.x * 1.35F, this.velocity.y * 1.35F, this.velocity.z * -1.1);
+                  this.velocity = new Vec3d(this.velocity.x * 0.8F, this.velocity.y * 0.8F, this.velocity.z * -0.5);
                }
 
                if (this.isBlockSolid(this.position.x, this.position.y + this.velocity.y, this.position.z)) {
-                  this.velocity = new Vec3d(this.velocity.x * 1.35F, this.velocity.y * -1.1, this.velocity.z * 1.35F);
+                  this.velocity = new Vec3d(this.velocity.x * 0.8F, this.velocity.y * -0.5, this.velocity.z * 0.8F);
                }
 
                if (this.isBlockSolid(this.position.x + this.velocity.x, this.position.y, this.position.z)) {
-                  this.velocity = new Vec3d(this.velocity.x * -1.1, this.velocity.y * 1.35F, this.velocity.z * 1.35F);
+                  this.velocity = new Vec3d(this.velocity.x * -0.5, this.velocity.y * 0.8F, this.velocity.z * 0.8F);
                }
             }
 

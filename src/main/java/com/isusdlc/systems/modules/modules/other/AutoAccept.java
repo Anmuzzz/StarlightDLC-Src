@@ -34,7 +34,8 @@ public class AutoAccept extends BaseModule {
          return true;
       } else {
          if (this.acceptMode.is(this.friendsOnly)) {
-            if (elegant.getInstance().getFriendManager().isFriend(message.split(" ")[1])
+            String[] parts = message.split(" ");
+            if (parts.length >= 2 && elegant.getInstance().getFriendManager().isFriend(parts[1])
                || elegant.getInstance()
                   .getFriendManager()
                   .isFriend(message.replace("\u0a77 просит телепортироваться к Вам.\u0a77§l [ੲ§l✔\u0a77§l]\u0a77§l [\u0a7c§l✗\u0a77§l]", "").replace("੶", ""))
@@ -43,8 +44,7 @@ public class AutoAccept extends BaseModule {
             }
 
             if (message.contains("телепортироваться")) {
-               String[] parts = message.split(" ");
-               return parts.length >= 2 && elegant.getInstance().getFriendManager().isFriend(parts[2]);
+               return parts.length >= 3 && elegant.getInstance().getFriendManager().isFriend(parts[2]);
             }
          }
 

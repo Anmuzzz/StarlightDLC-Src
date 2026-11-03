@@ -45,6 +45,11 @@ public class ConfigUploadServer extends NanoHTTPD implements IMinecraft {
                   originalName = "client.myth";
                }
 
+               originalName = new File(originalName).getName();
+               if (originalName.isEmpty() || originalName.contains("..") || !originalName.endsWith(".myth")) {
+                  return newFixedLengthResponse(Status.BAD_REQUEST, "text/plain", "Недопустимое имя файла конфига");
+               }
+
                this.name = originalName;
                this.render = true;
                File dest = new File(this.directory, originalName);
@@ -65,14 +70,17 @@ public class ConfigUploadServer extends NanoHTTPD implements IMinecraft {
                }
 
                System.out.println("Файл подтверждён, лоадим конфиг " + dest.getName());
-               ConfigManager mgr = elegant.getInstance().getConfigManager();
-               ConfigFile cfg = mgr.getConfig(originalName);
-               if (cfg == null) {
-                  cfg = new ConfigFile(originalName);
-                  mgr.getConfigFiles().add(cfg);
-               }
+               final String configName = originalName;
+               mc.execute(() -> {
+                  ConfigManager mgr = elegant.getInstance().getConfigManager();
+                  ConfigFile cfg = mgr.getConfig(configName);
+                  if (cfg == null) {
+                     cfg = new ConfigFile(configName);
+                     mgr.getConfigFiles().add(cfg);
+                  }
 
-               cfg.load();
+                  cfg.load();
+               });
                return newFixedLengthResponse("Конфиг успешно загружен и применён");
             }
          } catch (Exception var11) {

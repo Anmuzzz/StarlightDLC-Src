@@ -97,7 +97,7 @@ public class MineHelper extends BaseModule {
          mc.interactionManager
             .sendSequencedPacket(
                mc.world,
-               sequence -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, sequence, rotation.getServerRotation().getYaw(), rotation.getServerRotation().getYaw())
+               sequence -> new PlayerInteractItemC2SPacket(Hand.OFF_HAND, sequence, rotation.getServerRotation().getYaw(), rotation.getServerRotation().getPitch())
             );
       }
    }

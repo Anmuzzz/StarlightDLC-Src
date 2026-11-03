@@ -270,6 +270,7 @@ public class ItemRadius extends BaseModule {
       };
       int[][] faces = new int[][]{{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
       int fillColor = color & 16777215 | 1426063360;
+      RenderSystem.disableCull();
       BufferBuilder buffer = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
       for (int[] face : faces) {
@@ -302,6 +303,7 @@ public class ItemRadius extends BaseModule {
       }
 
       BufferRenderer.drawWithGlobalProgram(buffer.end());
+      RenderSystem.enableCull();
       int[][] edges = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
       buffer = tessellator.begin(DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
@@ -373,6 +375,7 @@ public class ItemRadius extends BaseModule {
       matrices.translate(-center.x, -center.y, -center.z);
       int[][] faces = new int[][]{{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
       int fillColor = color & 16777215 | 1426063360;
+      RenderSystem.disableCull();
       BufferBuilder buffer = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
       for (int[] face : faces) {
@@ -405,6 +408,7 @@ public class ItemRadius extends BaseModule {
       }
 
       BufferRenderer.drawWithGlobalProgram(buffer.end());
+      RenderSystem.enableCull();
       int[][] edges = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
       buffer = tessellator.begin(DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
@@ -448,6 +452,7 @@ public class ItemRadius extends BaseModule {
       };
       int[][] faces = new int[][]{{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
       int fillColor = color & 16777215 | 1426063360;
+      RenderSystem.disableCull();
       BufferBuilder buffer = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
 
       for (int[] face : faces) {
@@ -480,6 +485,7 @@ public class ItemRadius extends BaseModule {
       }
 
       BufferRenderer.drawWithGlobalProgram(buffer.end());
+      RenderSystem.enableCull();
       int[][] edges = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
       buffer = tessellator.begin(DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 

@@ -11,6 +11,7 @@ import com.isusdlc.systems.waypoints.WayPointsManager;
 import com.isusdlc.utility.game.MessageUtility;
 import net.minecraft.text.Text;
 import net.minecraft.client.gui.screen.DeathScreen;
+import net.minecraft.util.math.MathHelper;
 
 @ModuleInfo(
    name = "Death Cords",
@@ -24,9 +25,9 @@ public class DeathCords extends BaseModule {
       if (!(mc.currentScreen instanceof DeathScreen) || mc.player == null) {
          this.death = true;
       } else if (this.death) {
-         int xCord = (int)mc.player.getX();
-         int yCord = (int)mc.player.getY();
-         int zCord = (int)mc.player.getZ();
+         int xCord = MathHelper.floor(mc.player.getX());
+         int yCord = MathHelper.floor(mc.player.getY());
+         int zCord = MathHelper.floor(mc.player.getZ());
          MessageUtility.info(Text.of("Координаты смерти: " + xCord + " " + yCord + " " + zCord));
          if (this.wayDeath.isEnabled()) {
             WayPointsManager wayPointsManager = elegant.getInstance().getWayPointsManager();

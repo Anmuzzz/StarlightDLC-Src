@@ -77,7 +77,7 @@ public class ParticleEffects extends BaseModule {
          Vec3d currentPos = mc.player.getPos();
          double distance = currentPos.distanceTo(this.lastPlayerPos);
          boolean isOnGround = mc.player.isOnGround();
-         if (this.onMove.isEnabled() && isOnGround && distance > 0.01 && distance > 0.1) {
+         if (this.onMove.isEnabled() && isOnGround && distance > 0.1 && distance < 1.5) {
             Vec3d particlePos = currentPos.add((this.random.nextDouble() - 0.5) * 0.5, 0.1, (this.random.nextDouble() - 0.5) * 0.5);
             this.spawnParticles(particlePos, 1);
          }

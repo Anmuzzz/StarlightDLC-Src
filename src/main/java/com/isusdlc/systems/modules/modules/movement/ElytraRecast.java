@@ -23,16 +23,16 @@ import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 )
 public class ElytraRecast extends BaseModule {
    private final BooleanSetting changePitch = new BooleanSetting(this, "Change Pitch").enable();
-   private final SliderSetting pitchValue = new SliderSetting(this, "Pitch value", () -> this.changePitch.isEnabled())
+   private final SliderSetting pitchValue = new SliderSetting(this, "Pitch value", () -> !this.changePitch.isEnabled())
       .min(-90.0F).max(90.0F).step(1.0F).currentValue(55.0F);
    private final BooleanSetting autoJump = new BooleanSetting(this, "Auto Jump").enable();
 
    @Override
    public void onDisable() {
-      if (!mc.options.forwardKey.isPressed()) {
+      if (mc.options.forwardKey.isPressed()) {
          mc.options.forwardKey.setPressed(false);
       }
-      if (!mc.options.jumpKey.isPressed()) {
+      if (mc.options.jumpKey.isPressed()) {
          mc.options.jumpKey.setPressed(false);
       }
    }

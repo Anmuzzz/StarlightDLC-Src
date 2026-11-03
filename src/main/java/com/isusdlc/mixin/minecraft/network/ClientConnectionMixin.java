@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin({ClientConnection.class})
 public class ClientConnectionMixin implements IMinecraft {
    @Unique
-   private static boolean stackOverflowFix;
+   private static volatile boolean stackOverflowFix;
 
    @Inject(
       method = {"handlePacket(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;)V"},
@@ -24,6 +24,9 @@ public class ClientConnectionMixin implements IMinecraft {
       cancellable = true
    )
    private static <T extends PacketListener> void triggerReceivePacketEvent(Packet<T> packet, PacketListener listener, CallbackInfo ci) {
+      if (elegant.getInstance().getEventManager() == null) {
+         return;
+      }
       ReceivePacketEvent event = new ReceivePacketEvent(packet);
       elegant.getInstance().getEventManager().triggerEvent(event);
       if (event.isCancelled()) {
@@ -38,6 +41,9 @@ public class ClientConnectionMixin implements IMinecraft {
    )
    public void triggerSendPacketEvent(Packet<?> packet, CallbackInfo ci) {
       SendPacketEvent event = new SendPacketEvent(packet);
+      if (elegant.getInstance().getEventManager() == null) {
+         return;
+      }
       if (!stackOverflowFix) {
          elegant.getInstance().getEventManager().triggerEvent(event);
          if (event.isCancelled()) {
@@ -48,8 +54,13 @@ public class ClientConnectionMixin implements IMinecraft {
          if (newPacket != packet) {
             ci.cancel();
             stackOverflowFix = true;
-            mc.getNetworkHandler().sendPacket(newPacket);
-            stackOverflowFix = false;
+            try {
+               if (mc.getNetworkHandler() != null) {
+                  mc.getNetworkHandler().sendPacket(newPacket);
+               }
+            } finally {
+               stackOverflowFix = false;
+            }
          }
       }
    }

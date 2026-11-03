@@ -26,7 +26,7 @@ public class ScrollHandler implements IMinecraft {
       this.targetValue = Math.min(Math.max(this.targetValue, this.max), 0.0);
       double delta = this.targetValue - this.value;
       this.value += delta;
-      if (delta > 0.0) {
+      if (delta != 0.0) {
          this.scrollAnimation.setEasing(Math.abs(delta) > 21.0 ? Easing.QUARTIC_OUT : Easing.BAKEK);
       }
 

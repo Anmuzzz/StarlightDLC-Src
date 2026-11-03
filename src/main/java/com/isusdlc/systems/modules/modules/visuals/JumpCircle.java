@@ -64,7 +64,7 @@ public class JumpCircle extends BaseModule {
       float maxTime = time.getCurrentValue();
 
       matrices.push();
-      var buf = Tessellator.getInstance().begin(VertexFormat.DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
+      var buf = Tessellator.getInstance().begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
 
       for (CircleData c : circles) {
          float progress = (System.currentTimeMillis() - c.birth) / maxTime;

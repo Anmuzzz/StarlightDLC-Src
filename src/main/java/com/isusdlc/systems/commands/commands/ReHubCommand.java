@@ -21,7 +21,7 @@ public class ReHubCommand implements IMinecraft {
       if (this.processing
          && mc.world != null
          && mc.player != null
-         && (ServerUtility.isFT() || ServerUtility.isFT())
+         && (ServerUtility.isFT() || ServerUtility.isRW() || ServerUtility.isFS())
          && mc.world.getDifficulty() == Difficulty.EASY
          && this.timer.finished(1000L)) {
          mc.player.networkHandler.sendChatCommand("an" + ServerUtility.ftAn);

@@ -25,15 +25,21 @@ public class AutoTool extends BaseModule {
     private final List<Integer> lastItem = new ArrayList<>();
 
     private final EventListener<ClientPlayerTickEvent> listener = event -> {
-        if (!(mc.crosshairTarget instanceof BlockHitResult result)) return;
+        BlockPos pos = null;
+        if (mc.crosshairTarget instanceof BlockHitResult result) {
+            BlockPos hitPos = result.getBlockPos();
+            if (hitPos != null && !mc.world.getBlockState(hitPos).isAir()) {
+                pos = hitPos;
+            }
+        }
 
-        BlockPos pos = result.getBlockPos();
-        if (pos == null || mc.world.getBlockState(pos).isAir()) return;
-
-        int toolSlot = getBest(pos);
+        int toolSlot = pos == null ? -1 : getBest(pos);
 
         if (toolSlot != -1 && mc.options.attackKey.isPressed()) {
-            lastItem.add(mc.player.getInventory().selectedSlot);
+            if (!swap) {
+                lastItem.clear();
+                lastItem.add(mc.player.getInventory().selectedSlot);
+            }
             mc.player.getInventory().selectedSlot = toolSlot;
             itemIndex = toolSlot;
             swap = true;

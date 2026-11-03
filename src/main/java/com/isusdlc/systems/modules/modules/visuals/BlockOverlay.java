@@ -47,7 +47,8 @@ public class BlockOverlay extends BaseModule {
       float alpha = alphaAnim.getValue();
       if (alpha < 0.01F) return;
 
-      BlockPos pos = ((BlockHitResult) mc.crosshairTarget).getBlockPos();
+      if (!(mc.crosshairTarget instanceof BlockHitResult hit) || hit.getType() != Type.BLOCK || mc.world == null) return;
+      BlockPos pos = hit.getBlockPos();
       MatrixStack matrices = event.getMatrices();
       Camera camera = mc.gameRenderer.getCamera();
       Vec3d cameraPos = camera.getPos();

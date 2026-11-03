@@ -41,4 +41,13 @@ public class AutoEat extends BaseModule {
          mc.options.useKey.setPressed(false);
       }
    };
+
+   @Override
+   public void onDisable() {
+      super.onDisable();
+      if (mc.player != null) {
+         mc.options.useKey.setPressed(false);
+      }
+      this.eating = false;
+   }
 }

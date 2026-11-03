@@ -69,6 +69,7 @@ import com.isusdlc.systems.modules.modules.other.SpecBind;
 import com.isusdlc.systems.modules.modules.other.UnHook;
 import com.isusdlc.systems.modules.modules.other.AutoAppleFarm;
 import com.isusdlc.systems.modules.modules.other.ClientUsers;
+import com.isusdlc.systems.modules.modules.other.LuaModule;
 import com.isusdlc.systems.modules.modules.player.AutoEat;
 import com.isusdlc.systems.modules.modules.player.AutoInvisible;
 import com.isusdlc.systems.modules.modules.player.AutoLeave;
@@ -269,6 +270,7 @@ public class ModuleManager {
       this.register(new NoRender());
       this.register(new AutoAppleFarm());
       this.register(new ClientUsers());
+      this.register(new LuaModule());
       this.register(new BlockESP());
       this.register(new Arrows());
       this.register(new ESP());

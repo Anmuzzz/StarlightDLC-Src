@@ -56,8 +56,9 @@ public class AutoJoin extends BaseModule {
          }
       }
 
-      if ((ServerUtility.isFT() || ServerUtility.isRW() || ServerUtility.isST()) && this.grief.isSelected()) {
-         mc.player.networkHandler.sendChatCommand("an306");
+      if ((ServerUtility.isFT() || ServerUtility.isRW() || ServerUtility.isST()) && this.grief.isSelected() && this.timer.finished(500L)) {
+         this.timer.reset();
+         mc.player.networkHandler.sendChatCommand("an" + this.griefString);
       }
    };
    private final EventListener<ReceivePacketEvent> onReceivePacketEvent = event -> {

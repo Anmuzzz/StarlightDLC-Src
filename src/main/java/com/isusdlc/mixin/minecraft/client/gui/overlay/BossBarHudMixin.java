@@ -54,15 +54,18 @@ public class BossBarHudMixin implements IMinecraft {
 
       ServerUtility.setHasCT(ctTimer > 0);
       ServerUtility.setCtTime(ctTimer);
+      if (elegant.getInstance().getHud() == null || elegant.getInstance().getHud().getIsland() == null) {
+         return;
+      }
       Removals removals = elegant.getInstance().getModuleManager().getModuleSafe(Removals.class);
-      if ((removals == null || !removals.isEnabled() || !removals.getBossBar().isSelected())
+      boolean bossBarHidden = removals == null || !removals.isEnabled() || !removals.getBossBar().isSelected();
+      if (bossBarHidden
          && elegant.getInstance().getHud().getIsland().isShowing()
          && !this.bossBars.isEmpty()
-         && (!removals.isEnabled() || !removals.getBossBar().isSelected())
          && !ServerUtility.isCM()) {
          DynamicIsland island = elegant.getInstance().getHud().getIsland();
          boolean islandShowingPvp = island.isShowing() && island.statuses().stream().anyMatch(status -> status instanceof PVPStatus);
-         if (removals.isEnabled() && removals.getBossBar().isSelected() || ServerUtility.hasCT && islandShowingPvp) {
+         if (!bossBarHidden || ServerUtility.hasCT && islandShowingPvp) {
             return;
          }
 
@@ -78,7 +81,7 @@ public class BossBarHudMixin implements IMinecraft {
    )
    private void cancelRenderIfNeeded(DrawContext context, CallbackInfo ci) {
       Removals removals = elegant.getInstance().getModuleManager().getModuleSafe(Removals.class);
-      if (removals != null) {
+      if (removals != null && elegant.getInstance().getHud() != null && elegant.getInstance().getHud().getIsland() != null) {
          DynamicIsland island = elegant.getInstance().getHud().getIsland();
          boolean islandShowingPvp = island.isShowing() && island.statuses().stream().anyMatch(status -> status instanceof PVPStatus);
          if (removals.isEnabled() && removals.getBossBar().isSelected() || ServerUtility.hasCT && islandShowingPvp) {
@@ -93,11 +96,13 @@ public class BossBarHudMixin implements IMinecraft {
    )
    private void onRenderReturn(DrawContext context, CallbackInfo ci) {
       int j = 19 * this.bossBars.size();
+      if (elegant.getInstance().getHud() == null || elegant.getInstance().getHud().getIsland() == null) {
+         return;
+      }
       Removals removals = elegant.getInstance().getModuleManager().getModuleSafe(Removals.class);
       if ((removals == null || !removals.isEnabled() || !removals.getBossBar().isSelected())
          && elegant.getInstance().getHud().getIsland().isShowing()
          && !this.bossBars.isEmpty()
-         && (!removals.isEnabled() || !removals.getBossBar().isSelected())
          && !ServerUtility.isCM()) {
          context.getMatrices().pop();
       }

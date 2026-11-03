@@ -25,6 +25,13 @@ public class Velocity extends BaseModule {
          if (packet.getEntityId() == mc.player.getId()) {
             if (this.mode.is(this.cancel)) {
                event.cancel();
+            } else if (this.mode.is(this.reduce)) {
+               event.cancel();
+               mc.player.setVelocity(
+                  packet.getVelocityX() * 0.5,
+                  packet.getVelocityY() * 0.5,
+                  packet.getVelocityZ() * 0.5
+               );
             }
          }
       }

@@ -40,7 +40,10 @@ public class AutoWarden extends BaseModule {
       );
       if (wardens.isEmpty()) return;
 
-      WardenEntity nearest = wardens.get(0);
+      WardenEntity nearest = wardens.stream()
+         .min(java.util.Comparator.comparingDouble(mc.player::distanceTo))
+         .orElse(null);
+      if (nearest == null) return;
       double dist = mc.player.distanceTo(nearest);
       if (dist > range.getCurrentValue()) return;
 
@@ -49,17 +52,19 @@ public class AutoWarden extends BaseModule {
             ItemStack stack = mc.player.getInventory().main.get(i);
             if (stack.getItem() == Items.POTION) {
                var contents = stack.get(DataComponentTypes.POTION_CONTENTS);
-               if (contents != null) {
-                  for (StatusEffectInstance effect : contents.getEffects()) {
-                     if (effect.getEffectType() == StatusEffects.INVISIBILITY) {
-                        int prev = mc.player.getInventory().selectedSlot;
-                        mc.player.getInventory().selectedSlot = i;
-                        mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-                        mc.player.swingHand(Hand.MAIN_HAND);
-                        mc.player.getInventory().selectedSlot = prev;
-                        break;
-                     }
+               if (contents == null) continue;
+               boolean isInvisPotion = false;
+               for (StatusEffectInstance effect : contents.getEffects()) {
+                  if (effect.getEffectType() == StatusEffects.INVISIBILITY) {
+                     isInvisPotion = true;
+                     break;
                   }
+               }
+               if (isInvisPotion) {
+                  mc.player.getInventory().selectedSlot = i;
+                  mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                  mc.player.swingHand(Hand.MAIN_HAND);
+                  break;
                }
             }
          }

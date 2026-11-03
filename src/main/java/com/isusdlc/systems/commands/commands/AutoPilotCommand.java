@@ -19,7 +19,7 @@ public class AutoPilotCommand implements IMinecraft {
             .aliases("ap")
             .desc("Автопилот на элитрах")
             .param("action", (ParameterBuilder<String> p) ->
-                p.optional().literal("stop", "status"))
+                p.optional().validator(ValidationResult::ok))
             .param("x", (ParameterBuilder<String> p) ->
                 p.optional().validator(this::verifyCoord))
             .param("y", (ParameterBuilder<String> p) ->
@@ -41,9 +41,9 @@ public class AutoPilotCommand implements IMinecraft {
 
     private void handle(CommandContext ctx) {
         String action = (String) ctx.arguments().get(0);
-        String xs = (String) ctx.arguments().get(1);
-        String ys = (String) ctx.arguments().get(2);
-        String zs = (String) ctx.arguments().get(3);
+        String xs;
+        String ys;
+        String zs;
 
         Module mod = elegant.getInstance().getModuleManager().getModule(AutoPilotModule.class);
 
@@ -70,6 +70,11 @@ public class AutoPilotCommand implements IMinecraft {
             }
             return;
         }
+
+        // без действия первый токен — это координата X, остальные сдвигаются
+        xs = action;
+        ys = ctx.arguments().size() > 1 ? (String) ctx.arguments().get(1) : null;
+        zs = ctx.arguments().size() > 2 ? (String) ctx.arguments().get(2) : null;
 
         if (xs != null && ys != null && zs != null) {
             try {

@@ -38,14 +38,14 @@ public class VectorAnimation {
       if (vec == null) {
          throw new NullPointerException("vec is marked non-null but is null");
       } else {
-         this.x.setValue((float)vec.getX());
-         this.y.setValue((float)vec.getY());
-         this.z.setValue((float)vec.getZ());
+         this.x.update((float)vec.getX());
+         this.y.update((float)vec.getY());
+         this.z.update((float)vec.getZ());
       }
    }
 
    public Vec3d getVec() {
-      return new Vec3d((int)this.x.getValue(), (int)this.y.getValue(), (int)this.z.getValue());
+      return new Vec3d((double)this.x.getValue(), (double)this.y.getValue(), (double)this.z.getValue());
    }
 
    public void setEasing(Easing easing) {

@@ -61,7 +61,7 @@ public class Speed extends BaseModule {
       double mult = speed.getCurrentValue() * 0.2873;
       float yaw = mc.player.getYaw() * 0.017453292F;
       Vec3d forward = new Vec3d(-Math.sin(yaw), 0, Math.cos(yaw));
-      Vec3d strafeDir = new Vec3d(-Math.cos(yaw), 0, -Math.sin(yaw));
+      Vec3d strafeDir = new Vec3d(Math.cos(yaw), 0, Math.sin(yaw));
 
       float f = mc.player.input.movementForward;
       float s = mc.player.input.movementSideways;

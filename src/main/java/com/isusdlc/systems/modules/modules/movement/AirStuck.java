@@ -28,6 +28,7 @@ public class AirStuck extends BaseModule {
 
    private final EventListener<ClientPlayerTickEvent> onTick = event -> {
       if (mc.player == null) return;
+      if (!cancelMovement.isEnabled()) return;
       mc.player.setPosition(freezePosition);
       mc.player.setVelocity(Vec3d.ZERO);
    };

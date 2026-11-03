@@ -39,13 +39,12 @@ public class ColorAnimation {
 
    public void update(@NonNull ColorRGBA targetColor) {
       if (targetColor == null) {
-         throw new NullPointerException("targetColor is marked non-null but is null");
-      } else {
-         this.r.update(targetColor.getRed());
-         this.g.update(targetColor.getGreen());
-         this.b.update(targetColor.getBlue());
-         this.a.update(targetColor.getAlpha());
+         return;
       }
+      this.r.update(targetColor.getRed());
+      this.g.update(targetColor.getGreen());
+      this.b.update(targetColor.getBlue());
+      this.a.update(targetColor.getAlpha());
    }
 
    public ColorRGBA getColor() {

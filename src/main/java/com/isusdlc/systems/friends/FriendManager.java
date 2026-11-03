@@ -15,7 +15,9 @@ public class FriendManager implements IMinecraft {
    private final List<String> friends = new ArrayList<>();
 
    public void add(String name) {
-      if (elegant.getInstance().getTargetManager().getTarget().contains(name)) {
+      if (name == null || name.isBlank()) {
+         MessageUtility.error(Text.of("Укажите ник игрока: .friend add <ник>"));
+      } else if (elegant.getInstance().getTargetManager().getTarget().contains(name)) {
          MessageUtility.error(Text.of(Localizator.translate("commands.friends.target")));
       } else if (this.friends.contains(name)) {
          MessageUtility.info(Text.of(Localizator.translate("commands.friends.exists", name)));

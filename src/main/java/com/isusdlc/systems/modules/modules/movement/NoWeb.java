@@ -24,9 +24,9 @@ public class NoWeb extends BaseModule {
    private final ModeSetting.Value custom = new ModeSetting.Value(this.mode, "Custom").select();
    private final ModeSetting.Value reallyWorld = new ModeSetting.Value(this.mode, "ReallyWorld");
 
-   private final SliderSetting speedXZ = new SliderSetting(this, "Speed XZ", () -> this.mode.is(this.custom))
+   private final SliderSetting speedXZ = new SliderSetting(this, "Speed XZ", () -> !this.mode.is(this.custom))
       .min(0.1F).max(1.0F).step(0.1F).currentValue(0.1F);
-   private final SliderSetting speedY = new SliderSetting(this, "Speed Y", () -> this.mode.is(this.custom))
+   private final SliderSetting speedY = new SliderSetting(this, "Speed Y", () -> !this.mode.is(this.custom))
       .min(0.1F).max(4.0F).step(0.1F).currentValue(0.1F);
 
    private final EventListener<ClientPlayerTickEvent> onTick = event -> {

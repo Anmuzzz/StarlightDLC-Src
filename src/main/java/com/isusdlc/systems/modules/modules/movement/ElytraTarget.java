@@ -44,43 +44,43 @@ public class ElytraTarget extends BaseModule {
     public final ModeSetting.Value normal = new ModeSetting.Value(this.mode, "Обычный").select();
     public final ModeSetting.Value advanced = new ModeSetting.Value(this.mode, "Продвинутый");
 
-    private final SliderSetting sila = new SliderSetting(this, "Отлёт", () -> this.mode.is(this.advanced))
+    private final SliderSetting sila = new SliderSetting(this, "Отлёт", () -> !this.mode.is(this.advanced))
        .min(5.0F).max(40.0F).step(1.0F).currentValue(8.0F);
-    private final SliderSetting silaTime = new SliderSetting(this, "Время отлёта", () -> this.mode.is(this.advanced))
+    private final SliderSetting silaTime = new SliderSetting(this, "Время отлёта", () -> !this.mode.is(this.advanced))
        .min(200.0F).max(1000.0F).step(10.0F).currentValue(400.0F);
 
     private final BooleanSetting perelet = new BooleanSetting(this, "Перелёт").enable();
-    private final SliderSetting predict = new SliderSetting(this, "Предикт", () -> this.perelet.isEnabled())
+    private final SliderSetting predict = new SliderSetting(this, "Предикт", () -> !this.perelet.isEnabled())
        .min(0.1F).max(6.0F).step(0.1F).currentValue(2.6F);
 
-    private final BooleanSetting leaveHP = new BooleanSetting(this, "Улетать", () -> this.mode.is(this.advanced)).enable();
-    private final BooleanSetting leaveLowHP = new BooleanSetting(this, "Улетать при мало здоровья", () -> this.leaveHP.isEnabled() && this.mode.is(this.advanced));
-    private final BooleanSetting leaveUsingItem = new BooleanSetting(this, "Улетать при исп. предмета", () -> this.leaveHP.isEnabled() && this.mode.is(this.advanced));
-    private final BooleanSetting leaveShieldPush = new BooleanSetting(this, "Улетать при отжиме щита", () -> this.leaveHP.isEnabled() && this.mode.is(this.advanced));
+    private final BooleanSetting leaveHP = new BooleanSetting(this, "Улетать", () -> !this.mode.is(this.advanced)).enable();
+    private final BooleanSetting leaveLowHP = new BooleanSetting(this, "Улетать при мало здоровья", () -> !(this.leaveHP.isEnabled() && this.mode.is(this.advanced)));
+    private final BooleanSetting leaveUsingItem = new BooleanSetting(this, "Улетать при исп. предмета", () -> !(this.leaveHP.isEnabled() && this.mode.is(this.advanced)));
+    private final BooleanSetting leaveShieldPush = new BooleanSetting(this, "Улетать при отжиме щита", () -> !(this.leaveHP.isEnabled() && this.mode.is(this.advanced)));
 
-    private final BooleanSetting resolver = new BooleanSetting(this, "Resolver уклонение", () -> this.mode.is(this.advanced)).enable();
-    private final SliderSetting resolverStrength = new SliderSetting(this, "Сила резольвера", () -> this.resolver.isEnabled() && this.mode.is(this.advanced))
+    private final BooleanSetting resolver = new BooleanSetting(this, "Resolver уклонение", () -> !this.mode.is(this.advanced)).enable();
+    private final SliderSetting resolverStrength = new SliderSetting(this, "Сила резольвера", () -> !(this.resolver.isEnabled() && this.mode.is(this.advanced)))
        .min(4.0F).max(30.0F).step(1.0F).currentValue(12.0F);
 
-    public final BooleanSetting prefer = new BooleanSetting(this, "Менять направление", () -> this.mode.is(this.advanced)).enable();
+    public final BooleanSetting prefer = new BooleanSetting(this, "Менять направление", () -> !this.mode.is(this.advanced)).enable();
     public final BindSetting preferBind = new BindSetting(this, "Prefer bind");
 
-    private final BooleanSetting preferNorth = new BooleanSetting(this, "Pref Север", () -> this.prefer.isEnabled() && this.mode.is(this.advanced)).enable();
-    private final BooleanSetting preferSouth = new BooleanSetting(this, "Pref Юг", () -> this.prefer.isEnabled() && this.mode.is(this.advanced)).enable();
-    private final BooleanSetting preferWest = new BooleanSetting(this, "Pref Запад", () -> this.prefer.isEnabled() && this.mode.is(this.advanced)).enable();
-    private final BooleanSetting preferEast = new BooleanSetting(this, "Pref Восток", () -> this.prefer.isEnabled() && this.mode.is(this.advanced)).enable();
-    private final BooleanSetting preferUp = new BooleanSetting(this, "Pref Верх", () -> this.prefer.isEnabled() && this.mode.is(this.advanced)).enable();
-    private final BooleanSetting preferDown = new BooleanSetting(this, "Pref Вниз", () -> this.prefer.isEnabled() && this.mode.is(this.advanced));
+    private final BooleanSetting preferNorth = new BooleanSetting(this, "Pref Север", () -> !(this.prefer.isEnabled() && this.mode.is(this.advanced))).enable();
+    private final BooleanSetting preferSouth = new BooleanSetting(this, "Pref Юг", () -> !(this.prefer.isEnabled() && this.mode.is(this.advanced))).enable();
+    private final BooleanSetting preferWest = new BooleanSetting(this, "Pref Запад", () -> !(this.prefer.isEnabled() && this.mode.is(this.advanced))).enable();
+    private final BooleanSetting preferEast = new BooleanSetting(this, "Pref Восток", () -> !(this.prefer.isEnabled() && this.mode.is(this.advanced))).enable();
+    private final BooleanSetting preferUp = new BooleanSetting(this, "Pref Верх", () -> !(this.prefer.isEnabled() && this.mode.is(this.advanced))).enable();
+    private final BooleanSetting preferDown = new BooleanSetting(this, "Pref Вниз", () -> !(this.prefer.isEnabled() && this.mode.is(this.advanced)));
 
-    private final BooleanSetting avoidWalls = new BooleanSetting(this, "Избегать стены", () -> this.mode.is(this.advanced)).enable();
-    private final BooleanSetting firework = new BooleanSetting(this, "Отправка фейерверков", () -> this.mode.is(this.advanced)).enable();
-    private final SliderSetting fireworkTime = new SliderSetting(this, "Время отправки", () -> this.firework.isEnabled() && this.mode.is(this.advanced))
+    private final BooleanSetting avoidWalls = new BooleanSetting(this, "Избегать стены", () -> !this.mode.is(this.advanced)).enable();
+    private final BooleanSetting firework = new BooleanSetting(this, "Отправка фейерверков", () -> !this.mode.is(this.advanced)).enable();
+    private final SliderSetting fireworkTime = new SliderSetting(this, "Время отправки", () -> !(this.firework.isEnabled() && this.mode.is(this.advanced)))
        .min(100.0F).max(2000.0F).step(10.0F).currentValue(800.0F);
 
-    private final BooleanSetting fakelags = new BooleanSetting(this, "Fake Lags", () -> this.mode.is(this.advanced)).enable();
-    private final SliderSetting fakelagsDistance = new SliderSetting(this, "Дистанция флагера", () -> this.fakelags.isEnabled() && this.mode.is(this.advanced))
+    private final BooleanSetting fakelags = new BooleanSetting(this, "Fake Lags", () -> !this.mode.is(this.advanced)).enable();
+    private final SliderSetting fakelagsDistance = new SliderSetting(this, "Дистанция флагера", () -> !(this.fakelags.isEnabled() && this.mode.is(this.advanced)))
        .min(5.0F).max(20.0F).step(0.5F).currentValue(10.0F);
-    private final SliderSetting fakelagsMaxDistance = new SliderSetting(this, "Макс дистанция флагера", () -> this.fakelags.isEnabled() && this.mode.is(this.advanced))
+    private final SliderSetting fakelagsMaxDistance = new SliderSetting(this, "Макс дистанция флагера", () -> !(this.fakelags.isEnabled() && this.mode.is(this.advanced)))
        .min(15.0F).max(50.0F).step(1.0F).currentValue(30.0F);
 
     private final CopyOnWriteArrayList<Packet<?>> packetBuffer = new CopyOnWriteArrayList<>();
@@ -118,6 +118,7 @@ public class ElytraTarget extends BaseModule {
     private long lastFireworkCheck = 0L;
 
     private final EventListener<SendPacketEvent> onPacket = event -> {
+        if (mc.player == null || mc.world == null) return;
         if (!this.mode.is(this.advanced) || !mc.player.isGliding()) return;
         if (!fakelags.isEnabled()) return;
 

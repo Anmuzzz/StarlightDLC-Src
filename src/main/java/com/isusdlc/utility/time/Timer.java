@@ -10,7 +10,7 @@ public class Timer {
    }
 
    public boolean finished(long delay) {
-      return System.currentTimeMillis() - delay >= this.millis;
+      return System.currentTimeMillis() - this.millis >= delay;
    }
 
    public void reset() {

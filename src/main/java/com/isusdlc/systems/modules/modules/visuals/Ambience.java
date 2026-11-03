@@ -46,7 +46,7 @@ public class Ambience extends BaseModule {
    @Override
    public void onEnable() {
       if (EntityUtility.isInGame() && mc.world != null) {
-         this.oldTime = mc.world.getTime();
+         this.oldTime = mc.world.getTimeOfDay();
          super.onEnable();
       }
    }

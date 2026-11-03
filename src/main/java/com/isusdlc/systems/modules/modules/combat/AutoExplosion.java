@@ -73,7 +73,7 @@ public class AutoExplosion extends BaseModule {
          BlockPos pos = packet.getBlockHitResult().getBlockPos();
          BlockPos above = pos.up();
          if (mc.world.getBlockState(pos).isOf(Blocks.OBSIDIAN) && mc.world.isAir(above)) {
-            placedCrystals.add(above);
+            placedCrystals.add(pos);
          }
       }
    };
@@ -124,7 +124,7 @@ public class AutoExplosion extends BaseModule {
       mc.player.swingHand(Hand.MAIN_HAND);
 
       mc.player.getInventory().selectedSlot = prevSlot;
-      placedCrystals.add(pos);
+      placedCrystals.add(pos.down());
    }
 
    private int findCrystalSlot() {

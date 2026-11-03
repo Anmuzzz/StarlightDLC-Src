@@ -97,7 +97,8 @@ public class TNTTimer extends BaseModule {
 
    private float getPulseAlpha(int fuse) {
       if (fuse > 40) return 1.0F;
-      float dark = Math.min(1.0F, pulseAnim.update(1.0F));
+      pulseAnim.nonono();
+      float dark = Math.min(1.0F, pulseAnim.getValue());
       return fuse <= 20 ? dark : 1.0F - (1.0F - dark) * ((fuse - 20) / 20.0F);
    }
 }

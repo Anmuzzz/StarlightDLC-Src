@@ -79,7 +79,6 @@ public class Assist extends BaseModule {
             this.switchToItem(Items.PHANTOM_MEMBRANE);
          } else if (this.pilbKey.isKey(button)) {
             this.switchToItem(Items.SUGAR);
-         } else if (this.pilbKey.isKey(button)) {
          }
       }
    }

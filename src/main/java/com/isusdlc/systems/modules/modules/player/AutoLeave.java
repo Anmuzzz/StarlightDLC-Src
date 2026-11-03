@@ -33,13 +33,12 @@ public class AutoLeave extends BaseModule {
     private final EventListener<ClientPlayerTickEvent> listener = event -> {
         if (mc.player == null || mc.world == null) return;
 
-        if (pvpNoLeave.isEnabled() && mc.player.getHealth() <= 6) return;
-
         boolean shouldTrigger = false;
 
         if (hpMode.isSelected() && mc.player.getHealth() <= heal.getCurrentValue()) {
             shouldTrigger = true;
         } else if (playerMode.isSelected()) {
+            if (pvpNoLeave.isEnabled() && mc.player.getHealth() <= 6) return;
             shouldTrigger = mc.world.getPlayers().stream()
                 .anyMatch(other -> other != mc.player && mc.player.distanceTo(other) <= radius.getCurrentValue());
         }

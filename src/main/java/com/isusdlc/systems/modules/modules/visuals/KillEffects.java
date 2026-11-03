@@ -121,7 +121,7 @@ public class KillEffects extends BaseModule {
       RenderSystem.setShaderTexture(0, 0);
       RenderSystem.disableBlend();
       RenderSystem.enableCull();
-      RenderSystem.disableDepthTest();
+      RenderSystem.enableDepthTest();
       ms.pop();
       this.lightnings.removeIf(lightningx -> !lightningx.showing && lightningx.animation.getValue() == 0.0F);
    };

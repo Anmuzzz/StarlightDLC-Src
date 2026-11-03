@@ -45,7 +45,7 @@ public class NeuroAuraSystem {
     private long sessionStartTime = 0;
     private PerlinNoise noise = new PerlinNoise();
     private long startTime = System.currentTimeMillis();
-    private float smoothFactor = 0.0f;
+    private float smoothFactor = 0.3f;
     private Vec3d lastTargetPos = null;
     private Rotation lastRotation = null;
     private float lastYaw = 0;
@@ -238,6 +238,9 @@ public class NeuroAuraSystem {
 
         lastDebugMessage = String.format("§aНейро+Fun: Y%.1f° P%.1f° | Шум: %.2f",
                 avgYawDiff, avgPitchDiff, this.noiseFactor);
+
+        this.lastYaw = finalYaw;
+        this.lastPitch = finalPitch;
 
         return new Rotation(finalYaw, finalPitch);
     }

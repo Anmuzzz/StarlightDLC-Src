@@ -116,7 +116,7 @@ public class RotateTeacher extends BaseModule {
             double batchLoss = 0;
 
             for (int i = b; i < end; i++)
-               batchLoss += forwardBackward(X[idx[i]], Y[idx[i]]);
+               batchLoss += forwardBackward(X[idx[i]], Y[idx[i]], end - b);
 
             batchLoss /= (end - b);
             epochLoss += batchLoss;
@@ -132,7 +132,7 @@ public class RotateTeacher extends BaseModule {
       }
    }
 
-   private double forwardBackward(double[][] x, double[][] y) {
+   private double forwardBackward(double[][] x, double[][] y, double batchSize) {
       double[][] hs = new double[SEQ_LEN + 1][HIDDEN];
       double[][] zs = new double[SEQ_LEN][HIDDEN];
       double[][] rs = new double[SEQ_LEN][HIDDEN];
@@ -156,10 +156,10 @@ public class RotateTeacher extends BaseModule {
       for (int t = 0; t < SEQ_LEN; t++)
          for (int i = 0; i < OUTPUT; i++) {
             double err = out[t][i] - y[t][i];
-            dOut[t][i] = 2.0 * err / BATCH_SIZE;
+            dOut[t][i] = 2.0 * err / batchSize;
             loss += err * err;
          }
-      loss /= BATCH_SIZE;
+      loss /= batchSize;
 
       double[] dh_next = new double[HIDDEN];
       for (int t = SEQ_LEN - 1; t >= 0; t--) {

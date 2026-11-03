@@ -12,7 +12,7 @@ public abstract class ItemSlot implements IMinecraft {
    public abstract int getIdForServer();
 
    public int syncId() {
-      return mc.player != null && mc.player.currentScreenHandler != null ? mc.player.currentScreenHandler.syncId : 0;
+      return mc.player != null && mc.player.playerScreenHandler != null ? mc.player.playerScreenHandler.syncId : 0;
    }
 
    public Item item() {

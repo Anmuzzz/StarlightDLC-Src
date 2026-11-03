@@ -605,11 +605,11 @@ public final class DrawUtility implements IMinecraft, IWindow {
    public static void drawBlur(
       MatrixStack matrices, float x, float y, float width, float height, float blurRadius, float squirt, BorderRadius borderRadius, ColorRGBA color
    ) {
-      matrices.push();
-      Matrix4f matrix4f = matrices.peek().getPositionMatrix();
       float smoothness = 0.03F;
       blurRadius /= 22.5F;
       if (!(blurRadius <= 0.0F)) {
+         matrices.push();
+         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
          blurProgram.setBlurOffset(2.0F);
          squircleTextureProgram.use();
          RenderSystem.setShaderTexture(0, BlurProgram.getTexture());
@@ -649,10 +649,10 @@ public final class DrawUtility implements IMinecraft, IWindow {
    }
 
    public static void drawBlur(MatrixStack matrices, float x, float y, float width, float height, float blurRadius, BorderRadius borderRadius, ColorRGBA color) {
-      matrices.push();
-      Matrix4f matrix4f = matrices.peek().getPositionMatrix();
       blurRadius /= 22.5F;
       if (!(blurRadius <= 0.0F)) {
+         matrices.push();
+         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
          blurProgram.setBlurOffset(2.0F);
          roundedTextureProgram.use();
          RenderSystem.setShaderTexture(0, BlurProgram.getTexture());

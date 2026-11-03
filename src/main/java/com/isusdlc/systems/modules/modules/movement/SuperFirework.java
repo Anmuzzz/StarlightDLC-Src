@@ -22,7 +22,7 @@ public class SuperFirework extends BaseModule {
     private final ModeSetting.Value reallyWorld = new ModeSetting.Value(this.mode, "ReallyWorld");
     private final ModeSetting.Value custom = new ModeSetting.Value(this.mode, "Custom");
 
-   private final SliderSetting speed = new SliderSetting(this, "Speed", () -> this.mode.is(this.custom))
+   private final SliderSetting speed = new SliderSetting(this, "Speed", () -> !this.mode.is(this.custom))
       .min(1.50F).max(8.00F).step(0.01F).currentValue(1.70F);
 
    private final BooleanSetting nearBoost = new BooleanSetting(this, "Near boost");
@@ -30,12 +30,10 @@ public class SuperFirework extends BaseModule {
    private final EventListener<FireworkEvent> onFirework = event -> {
       if (mc.player == null) return;
 
-      if (!this.mode.is(this.custom)) {
-         double boostXZ = 1.61;
-         double boostY = 1.61;
-         Vec3d vel = mc.player.getVelocity();
-          mc.player.setVelocity(vel.x * boostXZ, vel.y * boostY, vel.z * boostXZ);
-      }
+      double boostXZ = this.mode.is(this.custom) ? this.speed.getCurrentValue() : 1.61;
+      double boostY = boostXZ;
+      Vec3d vel = mc.player.getVelocity();
+      mc.player.setVelocity(vel.x * boostXZ, vel.y * boostY, vel.z * boostXZ);
 
       if (this.nearBoost.isEnabled()) {
          LivingEntity nearest = null;
@@ -48,7 +46,7 @@ public class SuperFirework extends BaseModule {
             }
          }
          if (nearest != null && nearestDist < 5) {
-            Vec3d vel = mc.player.getVelocity();
+            vel = mc.player.getVelocity();
             mc.player.setVelocity(vel.x * 1.3, vel.y * 1.3, vel.z * 1.3);
          }
       }

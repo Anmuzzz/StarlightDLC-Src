@@ -53,7 +53,7 @@ public class ObjectInfo extends BaseModule {
       if (event.getPacket() instanceof PlaySoundS2CPacket sound) {
          String soundName = sound.getSound().getIdAsString();
          if (soundName.contains("minecraft:block.piston.extend") || soundName.contains("minecraft:block.piston.contract")) {
-            BlockPos pos = new BlockPos((int)sound.getX(), (int)sound.getY(), (int)sound.getZ());
+            BlockPos pos = BlockPos.ofFloored(sound.getX(), sound.getY(), sound.getZ());
             if ((sound.getVolume() == 0.5F || sound.getVolume() == 0.7F) && sound.getPitch() == 0.5F) {
                this.infos.put(pos, new ObjectInfo.Info(pos.up().add(0, 0, 0), ObjectInfo.ObjType.TRAP));
             }
@@ -62,7 +62,7 @@ public class ObjectInfo extends BaseModule {
          }
 
          if (soundName.contains("minecraft:block.anvil.place")) {
-            BlockPos pos = new BlockPos((int)sound.getX(), (int)sound.getY(), (int)sound.getZ());
+            BlockPos pos = BlockPos.ofFloored(sound.getX(), sound.getY(), sound.getZ());
             if ((sound.getVolume() == 0.5F || sound.getVolume() == 0.7F) && (sound.getPitch() == 1.1F || sound.getPitch() == 0.5F)) {
                this.infos.put(pos, new ObjectInfo.Info(pos.up().add(0, 0, 0), ObjectInfo.ObjType.PLAST));
             }
@@ -166,6 +166,7 @@ public class ObjectInfo extends BaseModule {
             MatrixStack matrices = e.getMatrices();
             Camera camera = IMinecraft.mc.gameRenderer.getCamera();
             Vec3d cameraPos = camera.getPos();
+            matrices.push();
             matrices.translate(-cameraPos.getX(), -cameraPos.getY(), -cameraPos.getZ());
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
@@ -209,6 +210,7 @@ public class ObjectInfo extends BaseModule {
             RenderSystem.enableCull();
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
+            matrices.pop();
          }
       }
 

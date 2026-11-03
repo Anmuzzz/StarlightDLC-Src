@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.isusdlc.elegant;
+import com.isusdlc.mixin.minecraft.client.IMinecraftClient;
 import com.isusdlc.systems.config.ConfigFile;
 import com.isusdlc.systems.file.ClientFile;
 import com.isusdlc.systems.file.FileManager;
@@ -63,9 +64,13 @@ public class ClientDataFile extends ClientFile implements IMinecraft {
    public void read() {
       try (FileReader reader = new FileReader(this.getFile())) {
          JsonObject object = (JsonObject)FileManager.GSON.fromJson(reader, JsonObject.class);
+         if (object == null) {
+            elegant.LOGGER.warn("Client data file is empty or corrupted, using defaults");
+            return;
+         }
          if (object.has("username")) {
             String username = object.get("username").getAsString();
-            new Session(username, UUID.randomUUID(), "", Optional.empty(), Optional.empty(), AccountType.MOJANG);
+            ((IMinecraftClient)mc).setSession(new Session(username, UUID.randomUUID(), "", Optional.empty(), Optional.empty(), AccountType.MOJANG));
          }
 
          if (object.has("swing")) {

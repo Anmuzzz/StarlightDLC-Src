@@ -18,7 +18,11 @@ public final class RotationMath implements IMinecraft {
    }
 
    public static Vec3d getNearestPoint(LivingEntity entity, Vec3d pos) {
-      return entity.getPos().subtract(entity.getPos()).add(getNearestPoint(entity));
+      return new Vec3d(
+         MathHelper.clamp(pos.x, entity.getBoundingBox().minX, entity.getBoundingBox().maxX),
+         MathHelper.clamp(pos.y, entity.getBoundingBox().minY, entity.getBoundingBox().maxY),
+         MathHelper.clamp(pos.z, entity.getBoundingBox().minZ, entity.getBoundingBox().maxZ)
+      );
    }
 
    public static Rotation getRotationTo(Vec3d targetedEntity) {

@@ -23,13 +23,12 @@ public final class Localizator {
       String langFile = "/assets/" + elegant.MOD_ID + "/lang/" + currentLanguage.getCode() + ".lang";
       System.out.println("Loading translations from: " + langFile);
 
-      try {
-         InputStream inputStream = Localizator.class.getResourceAsStream(langFile);
+      try (InputStream inputStream = Localizator.class.getResourceAsStream(langFile);
+         BufferedReader reader = inputStream == null ? null : new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
          if (inputStream == null) {
             throw new RuntimeException("Language file not found: " + langFile);
          } else {
             translations.clear();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String fileName = currentLanguage.getCode() + ".lang";
             int lineNumber = 0;
 
@@ -54,7 +53,6 @@ public final class Localizator {
             }
 
             System.out.println("Loaded " + translations.size() + " translations");
-            reader.close();
          }
       } catch (IOException var9) {
          throw new RuntimeException("Failed to load translations for language: " + currentLanguage.getCode(), var9);

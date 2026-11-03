@@ -30,6 +30,10 @@ public class AfkHandler {
          afkActionStep = 0;
          cycleTimer.resetCounter();
          afkActionTimer.resetCounter();
+      } else if (!inAfk && wasInAfk && performingAfkAction) {
+         resetMovementKeys(client.options);
+         performingAfkAction = false;
+         afkActionStep = 0;
       }
       wasInAfk = inAfk;
       if (inAfk) {

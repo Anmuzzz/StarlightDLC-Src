@@ -419,7 +419,7 @@ public class Prediction extends BaseModule {
       return entity instanceof TridentEntity trident && trident.returnTimer > 0
          ? false
          : valid
-            && (Math.abs(entity.getVelocity().x + entity.getVelocity().z) > 0.01F || Math.abs(entity.getVelocity().y) > 0.2F);
+            && (Math.abs(entity.getVelocity().x) + Math.abs(entity.getVelocity().z) > 0.01F || Math.abs(entity.getVelocity().y) > 0.2F);
    }
 
    private Entity checkEntityCollision(Entity movingEntity, Vec3d predictedPos) {

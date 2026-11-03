@@ -44,7 +44,6 @@ public class MusicTracker implements IMinecraft {
 
    private void onScheduleTask() {
       try {
-         MediaPlayerInfo.INSTANCE.getMediaSessions().clear();
          List<IMediaSession> sessions = MediaPlayerInfo.INSTANCE.getMediaSessions();
          this.session = sessions.stream()
             .filter(session1 -> !session1.getMedia().getArtist().isEmpty() && !session1.getMedia().getTitle().isEmpty())

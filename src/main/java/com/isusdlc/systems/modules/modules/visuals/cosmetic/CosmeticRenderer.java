@@ -36,6 +36,8 @@ public class CosmeticRenderer {
         model.loadTexture();
         if (model.getRenderRoots().isEmpty()) return;
 
+        BufferBuilder buf = null;
+        matrices.push();
         try {
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(
@@ -47,10 +49,9 @@ public class CosmeticRenderer {
             RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-            BufferBuilder buf = Tessellator.getInstance().begin(
+            buf = Tessellator.getInstance().begin(
                     VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
-            matrices.push();
             float sy = flipY ? -S : S;
             matrices.scale(S, sy, S);
 
@@ -65,8 +66,6 @@ public class CosmeticRenderer {
                 boundIndex = renderBone(buf, matrices, model, bone, boundIndex);
             }
 
-            matrices.pop();
-
             BufferRenderer.drawWithGlobalProgram(buf.end());
 
             RenderSystem.enableCull();
@@ -74,6 +73,14 @@ public class CosmeticRenderer {
             RenderSystem.depthMask(true);
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         } catch (Exception ignored) {
+            if (buf != null) {
+                try {
+                    buf.end();
+                } catch (Exception suppressed) {
+                }
+            }
+        } finally {
+            matrices.pop();
         }
     }
 

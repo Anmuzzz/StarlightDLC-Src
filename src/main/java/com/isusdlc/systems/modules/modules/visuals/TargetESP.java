@@ -187,7 +187,7 @@ public class TargetESP extends BaseModule {
             RenderSystem.setShaderTexture(0, 0);
             RenderSystem.disableBlend();
             RenderSystem.enableCull();
-            RenderSystem.disableDepthTest();
+            RenderSystem.enableDepthTest();
             ms.pop();
          }
       }
@@ -370,7 +370,7 @@ public class TargetESP extends BaseModule {
          float cos = (float)(MathUtility.cos((float)Math.toRadians(i + this.movingValue * 0.3F)) * width * val);
          float size = 0.1F;
          ms.push();
-         ms.translate(sin, 0.1F + target.getHeight() * Math.abs(MathUtility.sin(i)), cos);
+         ms.translate(sin, 0.1F + target.getHeight() * Math.abs(MathUtility.sin((float)Math.toRadians(i))), cos);
          Vec3d crystalPos = this.getRenderPos(this.prevTarget).add(sin, 1.0, cos);
          Vec3d targetPos = target.getPos().add(0.0, target.getHeight() / 2.0, 0.0);
          Vector3f directionToTarget = new Vector3f(
@@ -398,7 +398,7 @@ public class TargetESP extends BaseModule {
          float sin = (float)(MathUtility.sin((float)Math.toRadians(i + this.movingValue * 0.3F)) * width * val);
          float cos = (float)(MathUtility.cos((float)Math.toRadians(i + this.movingValue * 0.3F)) * width * val);
          ms.push();
-         ms.translate(sin, 0.1F + target.getHeight() * Math.abs(MathUtility.sin(i)), cos);
+         ms.translate(sin, 0.1F + target.getHeight() * Math.abs(MathUtility.sin((float)Math.toRadians(i))), cos);
          ms.multiply(camera.getRotation());
          DrawUtility.drawImage(
             ms,
@@ -682,7 +682,7 @@ public class TargetESP extends BaseModule {
                double dirX = nextWorldX - worldX;
                double dirY = nextWorldY - worldY;
                double dirZ = nextWorldZ - worldZ;
-               float pigYaw = (float)Math.toDegrees(Math.atan2(-dirZ, dirX)) - 95.0F;
+               float pigYaw = (float)Math.toDegrees(Math.atan2(dirX, dirZ));
                ms.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(pigYaw));
             }
 

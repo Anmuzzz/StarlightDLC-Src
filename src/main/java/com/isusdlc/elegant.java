@@ -100,20 +100,6 @@ public enum elegant implements IMinecraft {
       this.fileManager = new FileManager();
       this.moduleManager = new ModuleManager(new ModuleTickListener(), new ModuleWidgetRenderer());
       this.hud = new Hud();
-      this.tpsHandler = new TPSHandler();
-      this.notificationManager = new NotificationManager();
-      this.configManager = new ConfigManager();
-      this.fileManager.registerClientFiles();
-      this.moduleManager.registerModules();
-      this.moduleManager.enableModules();
-      this.menuScreen = new com.isusdlc.ui.menu.dropdown.DropDownScreen();
-      this.configManager.handle();
-      this.commandManager = new CommandRegistry();
-      this.commandManager.initCommands();
-      this.swingManager = new SwingManager();
-      this.swingPresetManager = new SwingPresetManager();
-      this.swingPresetManager.handle();
-      this.fileManager.loadClientFiles();
       if (this.hud != null) {
          String[] coreHudNames = new String[] {
             "hud.armor",
@@ -135,6 +121,20 @@ public enum elegant implements IMinecraft {
             }
          }
       }
+      this.tpsHandler = new TPSHandler();
+      this.notificationManager = new NotificationManager();
+      this.configManager = new ConfigManager();
+      this.fileManager.registerClientFiles();
+      this.moduleManager.registerModules();
+      this.moduleManager.enableModules();
+      this.menuScreen = new com.isusdlc.ui.menu.dropdown.DropDownScreen();
+      this.configManager.handle();
+      this.commandManager = new CommandRegistry();
+      this.commandManager.initCommands();
+      this.swingManager = new SwingManager();
+      this.swingPresetManager = new SwingPresetManager();
+      this.swingPresetManager.handle();
+      this.fileManager.loadClientFiles();
       ConfigFile autosaveConfig = this.configManager.getConfig("autosave", true);
       if (autosaveConfig != null) {
          LOGGER.info("Loading autosave config on startup...");
@@ -187,14 +187,20 @@ public enum elegant implements IMinecraft {
          this.moduleManager.disableAllModules();
       }
 
-      this.fileManager.saveClientFiles();
+      if (this.fileManager != null) {
+         this.fileManager.saveClientFiles();
+      }
       if (!this.isPanic()) {
          LOGGER.error("=== SAVING AUTOSAVE CONFIG ===");
          System.err.println("=== SAVING AUTOSAVE CONFIG ===");
-         this.swingPresetManager.getAutoSavePreset().save();
-         ConfigFile autosaveConfig = this.configManager.getConfig("autosave", false);
-         if (autosaveConfig != null) {
-            autosaveConfig.save();
+         if (this.swingPresetManager != null) {
+            this.swingPresetManager.getAutoSavePreset().save();
+         }
+         if (this.configManager != null) {
+            ConfigFile autosaveConfig = this.configManager.getConfig("autosave", false);
+            if (autosaveConfig != null) {
+               autosaveConfig.save();
+            }
          }
 
          LOGGER.error("=== AUTOSAVE CONFIG SAVED ===");

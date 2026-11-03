@@ -92,7 +92,7 @@ public class ShulkerPreview extends BaseModule {
          if (container != null) {
             return container.stream().anyMatch(s -> !s.isEmpty());
          } else {
-            return stack.contains(DataComponentTypes.BLOCK_ENTITY_DATA) ? true : true;
+            return stack.contains(DataComponentTypes.BLOCK_ENTITY_DATA);
          }
       }
    }
@@ -224,10 +224,10 @@ public class ShulkerPreview extends BaseModule {
             return new ColorRGBA(110.0F, 190.0F, 30.0F, 255.0F);
          } else if (blockName.contains("pink")) {
             return new ColorRGBA(240.0F, 160.0F, 180.0F, 255.0F);
-         } else if (blockName.contains("gray")) {
-            return new ColorRGBA(70.0F, 70.0F, 70.0F, 255.0F);
          } else if (blockName.contains("light_gray")) {
             return new ColorRGBA(150.0F, 150.0F, 150.0F, 255.0F);
+         } else if (blockName.contains("gray")) {
+            return new ColorRGBA(70.0F, 70.0F, 70.0F, 255.0F);
          } else if (blockName.contains("cyan")) {
             return new ColorRGBA(40.0F, 120.0F, 140.0F, 255.0F);
          } else if (blockName.contains("purple")) {

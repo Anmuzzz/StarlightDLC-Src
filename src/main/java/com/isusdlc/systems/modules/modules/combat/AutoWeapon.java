@@ -8,6 +8,8 @@ import com.isusdlc.systems.modules.impl.BaseModule;
 import com.isusdlc.systems.setting.settings.BooleanSetting;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 
@@ -55,7 +57,9 @@ public class AutoWeapon extends BaseModule {
       if (comp == null) return 1;
       float dmg = 1;
       for (var entry : comp.modifiers()) {
-         if (entry.slot() == AttributeModifierSlot.MAINHAND || entry.slot() == AttributeModifierSlot.HAND) {
+         if ((entry.slot() == AttributeModifierSlot.MAINHAND || entry.slot() == AttributeModifierSlot.HAND)
+            && entry.attribute() == EntityAttributes.ATTACK_DAMAGE
+            && entry.modifier().operation() == EntityAttributeModifier.Operation.ADD_VALUE) {
             dmg += (float) entry.modifier().value();
          }
       }

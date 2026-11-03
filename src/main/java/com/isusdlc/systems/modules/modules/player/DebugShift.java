@@ -63,7 +63,7 @@ public class DebugShift extends BaseModule {
    };
 
    public DebugShift() {
-      this.setEnabled(false);
+      this.setEnabled(false, true);
    }
 
    @Override

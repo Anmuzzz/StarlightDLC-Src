@@ -14,4 +14,11 @@ import com.isusdlc.systems.modules.impl.BaseModule;
 )
 public class AutoSprint extends BaseModule {
    private final EventListener<ClientPlayerTickEvent> onUpdateEvent = event -> mc.options.sprintKey.setPressed(true);
+
+   @Override
+   public void onDisable() {
+      if (mc.player != null) {
+         mc.options.sprintKey.setPressed(false);
+      }
+   }
 }

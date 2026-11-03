@@ -33,6 +33,13 @@ public class ShiftTap extends BaseModule {
                   this.shouldReleaseNext = false;
                }
 
+               if (this.sneakTicksRemaining > 0) {
+                  this.sneakTicksRemaining--;
+                  if (this.sneakTicksRemaining == 0) {
+                     mc.options.sneakKey.setPressed(false);
+                  }
+               }
+
                if (attackPressed && !this.wasAttackPressed) {
                   boolean isEntityTarget = mc.crosshairTarget instanceof EntityHitResult;
                   if (isEntityTarget) {
@@ -41,18 +48,12 @@ public class ShiftTap extends BaseModule {
                      if (hold == 1) {
                         this.shouldReleaseNext = true;
                      } else {
-                        this.sneakTicksRemaining = hold - 1;
+                        this.sneakTicksRemaining = hold;
                      }
                   }
                }
 
                this.wasAttackPressed = attackPressed;
-               if (this.sneakTicksRemaining > 0) {
-                  this.sneakTicksRemaining--;
-                  if (this.sneakTicksRemaining == 0) {
-                     mc.options.sneakKey.setPressed(false);
-                  }
-               }
             }
          }
       }

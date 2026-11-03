@@ -44,6 +44,9 @@ public class MinecraftClientMixin {
       at = {@At("HEAD")}
    )
    public void tick(CallbackInfo ci) {
+      if (elegant.getInstance() == null || elegant.getInstance().getEventManager() == null) {
+         return;
+      }
       elegant.getInstance().getEventManager().triggerEvent(new GameTickEvent());
    }
 

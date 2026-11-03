@@ -71,6 +71,11 @@ public class AutoDuel extends BaseModule {
       lastResetTime = 0L;
       lastChoiceTime = 0L;
       lastToTime = 0L;
+      if (mc.player != null) {
+         lastPosX = mc.player.getX();
+         lastPosY = mc.player.getY();
+         lastPosZ = mc.player.getZ();
+      }
       sent.clear();
       super.onEnable();
    }

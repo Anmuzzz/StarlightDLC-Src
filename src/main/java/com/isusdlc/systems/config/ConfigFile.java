@@ -60,7 +60,7 @@ public class ConfigFile implements IMinecraft {
                   if (moduleObject.has("name")) {
                      String moduleName = moduleObject.get("name").getAsString();
                      boolean enabled = moduleObject.has("enabled") && moduleObject.get("enabled").getAsBoolean();
-                     int key = moduleObject.has("key") ? moduleObject.get("key").getAsInt() : 0;
+                     int key = moduleObject.has("key") ? moduleObject.get("key").getAsInt() : -1;
 
                      try {
                         Module module = elegant.getInstance().getModuleManager().getModule(moduleName);

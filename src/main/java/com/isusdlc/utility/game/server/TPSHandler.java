@@ -41,6 +41,6 @@ public class TPSHandler {
          }
       }
 
-      return MathHelper.clamp(sumTickRates / numTicks, 0.0F, 20.0F);
+      return numTicks == 0.0F ? 20.0F : MathHelper.clamp(sumTickRates / numTicks, 0.0F, 20.0F);
    }
 }

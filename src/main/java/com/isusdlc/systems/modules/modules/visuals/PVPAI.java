@@ -144,7 +144,7 @@ public class PVPAI extends BaseModule implements IMinecraft, IScaledResolution {
                   float scale = dmg.getScale() * this.damageSize.getCurrentValue();
                   matrices.scale(scale, scale, 1.0F);
                   ColorRGBA damageColorValue = this.damageColor.getColor();
-                  int color = damageColorValue.withAlpha(alpha).getRGB();
+                  int color = damageColorValue.withAlpha(alpha * 255.0F).getRGB();
                   RenderSystem.enableBlend();
                   RenderSystem.defaultBlendFunc();
                   Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();

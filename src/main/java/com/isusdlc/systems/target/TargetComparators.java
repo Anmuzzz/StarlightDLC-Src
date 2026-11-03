@@ -27,15 +27,7 @@ public class TargetComparators implements IMinecraft {
    });
    public static final Comparator<Entity> BAD_ARMOR = Comparator.comparingDouble(entity -> {
       if (entity instanceof PlayerEntity player) {
-         double totalArmor = 0.0;
-
-         for (ItemStack armorStack : player.getAllArmorItems()) {
-            if (armorStack != null && !armorStack.isEmpty()) {
-               totalArmor += armorStack.getItem().getDefaultStack().getCount();
-            }
-         }
-
-         return totalArmor;
+         return (double) player.getArmor();
       } else {
          return Double.MAX_VALUE;
       }

@@ -31,6 +31,7 @@ public class AutoTotem extends BaseModule {
 
    private final EventListener<ClientPlayerTickEvent> onTick = event -> {
       if (mc.world == null || mc.player == null) return;
+      if (mc.currentScreen != null && !(mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.InventoryScreen)) return;
 
       float hp = mc.player.getHealth() + mc.player.getAbsorptionAmount();
       ItemStack offhand = mc.player.getOffHandStack();
@@ -38,7 +39,7 @@ public class AutoTotem extends BaseModule {
       if (hp <= health.getCurrentValue()) {
          if (offhand.getItem() != Items.TOTEM_OF_UNDYING) {
             int slot = findTotem();
-            if (slot != -1) {
+            if (slot != -1 && !swapping) {
                swapping = true;
                swapTimer = 0;
             }

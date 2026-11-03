@@ -168,6 +168,8 @@ public class KillAura extends BaseModule {
    private void handleSprintPre() {
       if (sprintPacket.isSelected() && mc.player != null && mc.player.isSprinting()) {
          mc.player.setSprinting(false);
+         stopSprintPacketSent = true;
+         wasSprinting = true;
       }
    }
 
@@ -197,11 +199,11 @@ public class KillAura extends BaseModule {
       Vec3d eyePos = mc.player.getEyePos();
       List<LivingEntity> valid = new ArrayList<>();
       for (LivingEntity e : entities) {
-         if (!(getDistanceTo(e, eyePos) > maxDist) && isValidTargetType(e)) {
+         if (!(getDistanceSqTo(e, eyePos) > maxDist * maxDist) && isValidTargetType(e)) {
             valid.add(e);
          }
       }
-      return valid.stream().min(Comparator.comparingDouble(e -> getDistanceTo(e, eyePos))).orElse(null);
+      return valid.stream().min(Comparator.comparingDouble(e -> getDistanceSqTo(e, eyePos))).orElse(null);
    }
 
    private boolean isValidTargetType(LivingEntity entity) {
@@ -230,7 +232,7 @@ public class KillAura extends BaseModule {
       return false;
    }
 
-   private double getDistanceTo(LivingEntity entity, Vec3d eyePos) {
+   private double getDistanceSqTo(LivingEntity entity, Vec3d eyePos) {
       Box box = entity.getBoundingBox();
       double nearestX = Math.max(box.minX, Math.min(eyePos.x, box.maxX));
       double nearestY = Math.max(box.minY, Math.min(eyePos.y, box.maxY));
@@ -476,7 +478,7 @@ public class KillAura extends BaseModule {
 
       for (double y = entityBox.minY; y <= entityBox.maxY; y += stepY) {
          Vec3d point = new Vec3d(entityBox.getCenter().x, y, entityBox.getCenter().z);
-         if (eyePos.squaredDistanceTo(point) < maxDist) {
+         if (eyePos.squaredDistanceTo(point) < maxDist * maxDist) {
             candidates.add(point);
          }
       }

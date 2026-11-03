@@ -58,12 +58,12 @@ public class MixinCosmeticRenderer<T extends LivingEntity, S extends LivingEntit
     }
 
     private void renderCosmetic(S state, MatrixStack matrices, VertexConsumerProvider consumers, int light, CosmeticModel model, CosmeticType type) {
+        matrices.push();
         try {
             MinecraftClient mc = MinecraftClient.getInstance();
             float partialTicks = mc.getRenderTickCounter().getTickDelta(false);
             CosmeticManager mgr = CosmeticManager.getInstance();
 
-            matrices.push();
             CosmeticAttachmentTransforms.apply(matrices, type, model);
 
             mgr.getAnimator().apply(model, partialTicks,
@@ -77,9 +77,9 @@ public class MixinCosmeticRenderer<T extends LivingEntity, S extends LivingEntit
             if (type == CosmeticType.MODEL && mc.player != null) {
                 CosmeticHandItemsRenderer.render(mc.player, model, matrices, consumers, light, partialTicks);
             }
-
-            matrices.pop();
         } catch (Exception ignored) {
+        } finally {
+            matrices.pop();
         }
     }
 }

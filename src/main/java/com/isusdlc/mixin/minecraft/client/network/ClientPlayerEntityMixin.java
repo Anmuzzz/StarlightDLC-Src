@@ -116,7 +116,7 @@ public class ClientPlayerEntityMixin implements ClientPlayerEntityAddition, IMin
    public float replaceMovePacketPitch(ClientPlayerEntity instance) {
       RotationHandler rotationHandler = elegant.getInstance().getRotationHandler();
       float pitch = rotationHandler.isIdling() ? instance.getPitch() : rotationHandler.getCurrentRotation().getPitch();
-      rotationHandler.getServerRotation().setYaw(pitch);
+      rotationHandler.getServerRotation().setPitch(pitch);
       return pitch;
    }
 

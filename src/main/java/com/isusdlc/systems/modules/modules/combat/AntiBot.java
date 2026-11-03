@@ -30,7 +30,7 @@ public class AntiBot extends BaseModule {
     };
 
     private void detectBots() {
-        for (PlayerEntity entity : mc.world.getPlayers()) {
+        for (PlayerEntity entity : new ArrayList<>(mc.world.getPlayers())) {
             if (entity == mc.player) continue;
 
             if (isBotCandidate(entity)) {

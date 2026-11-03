@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import com.isusdlc.features.autobuy.items.AutoBuyableItem;
 import com.isusdlc.features.autobuy.manager.AutoBuyManager;
 import com.isusdlc.features.autobuy.parser.FunTimePriceParser;
+import com.isusdlc.display.screens.autobuy.AutoBuyScreen;
 import net.minecraft.client.MinecraftClient;
 
 public class NetworkManager {
@@ -40,6 +41,7 @@ public class NetworkManager {
    private ConcurrentLinkedQueue<BuyRequest> priorityQueue = new ConcurrentLinkedQueue<>();
 
    public void start(String var1) {
+      if (this.running) return;
       this.running = true;
       this.isClientMode = var1.equals("Проверяющий");
       this.executorService.execute(() -> this.connectionLoop(var1));
@@ -190,7 +192,8 @@ public class NetworkManager {
             MinecraftClient.getInstance().execute(() -> {
                if (var5 > 0 && var6 >= 0) {
                   AutoBuyableItem var3x = FunTimePriceParser.findItemByDisplayNameStatic(var4);
-                  if (var3x != null) {
+                  if (var3x != null && var6 > 0) {
+                     var3x.getSettings().setBuyBelow(var6);
                      System.out.println("[NetworkManager] Цена для \"" + var4 + "\" установлена: " + formatPrice(var6));
                   }
                }
@@ -250,12 +253,9 @@ public class NetworkManager {
 
    private void sendPricesTo(PrintWriter var1) {
       try {
-         for (Entry var3 : new HashMap<>().entrySet()) {
-            if (var3 != null && var3.getKey() != null) {
-               Integer var4 = (Integer)var3.getValue();
-               if (var4 != null) {
-                  var1.println("price_sync:" + ((AutoBuyableItem)var3.getKey()).getDisplayName() + "|" + var4);
-               }
+         for (AutoBuyableItem item : AutoBuyManager.getInstance().getAllItems()) {
+            if (item != null && item.getDisplayName() != null && item.getSettings().getBuyBelow() > 0) {
+               var1.println("price_sync:" + item.getDisplayName() + "|" + item.getSettings().getBuyBelow());
             }
          }
 
@@ -265,6 +265,17 @@ public class NetworkManager {
    }
 
    private void handlePriceSync(String var1) {
+      String var2 = var1.substring("price_sync:".length());
+      int var3 = var2.indexOf('|');
+      if (var3 > 0) {
+         String var4 = var2.substring(0, var3);
+
+         try {
+            int var5 = Integer.parseInt(var2.substring(var3 + 1).trim());
+            MinecraftClient.getInstance().execute(() -> AutoBuyScreen.INSTANCE.applySyncedPrice(var4, var5));
+         } catch (NumberFormatException var6) {
+         }
+      }
    }
 
    private void removeConnection(Socket var1) {

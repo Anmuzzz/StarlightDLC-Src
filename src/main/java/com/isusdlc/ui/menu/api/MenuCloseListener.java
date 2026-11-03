@@ -23,7 +23,7 @@ public class MenuCloseListener implements IMinecraft {
       if (menuScreen != null) {
          menuScreen.getMenuAnimation().update(menuScreen.isClosing() ? 0.0F : 1.0F);
          if (!(mc.currentScreen instanceof MenuScreen) && elegant.getInstance().getModuleManager().getModule(MenuModule.class).isEnabled()) {
-            elegant.getInstance().getModuleManager().getModule(MenuModule.class).setEnabled(false);
+            elegant.getInstance().getModuleManager().getModule(MenuModule.class).setEnabled(false, true);
          }
 
          if (menuScreen.getMenuAnimation().getValue() > 0.1F && !(mc.currentScreen instanceof MenuScreen) && menuScreen.isClosing()) {

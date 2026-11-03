@@ -62,6 +62,15 @@ public class AutoInvisible extends BaseModule {
       }
    };
 
+   @Override
+   public void onDisable() {
+      super.onDisable();
+      if (mc.player != null) {
+         mc.options.useKey.setPressed(false);
+      }
+      this.isUsingPotion = false;
+   }
+
    private boolean isInvisibilityPotion(ItemStack stack) {
       return PotionUtility.hasEffect(stack, StatusEffects.INVISIBILITY);
    }
