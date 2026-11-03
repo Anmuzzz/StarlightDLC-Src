@@ -34,6 +34,13 @@ dependencies {
     implementation "org.luaj:luaj-jse:3.0.1"
     include "org.luaj:luaj-jse:3.0.1"
 
+    // JavaFX для встроенного YouTube-плеера (WebView + медиа), сборка под Windows
+    def jfxVersion = '21.0.5'
+    ['base', 'graphics', 'media', 'web'].each { module ->
+        implementation "org.openjfx:javafx-$module:$jfxVersion:win"
+        include "org.openjfx:javafx-$module:$jfxVersion:win"
+    }
+
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
