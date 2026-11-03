@@ -553,3 +553,5 @@ modules.descriptions.pvp_ai=Pokazuje szanse wygranej i wskaźniki obrażeń
 modules.settings.pvp_ai.damage_indicator=Wskaźnik obrażeń
 modules.settings.pvp_ai.damage_size=Rozmiar obrażeń
 modules.settings.pvp_ai.damage_color=Kolor obrażeń
+modules.settings.target_esp.mode.gradient=Gradient
+modules.settings.target_esp.mode.halo=Aureola

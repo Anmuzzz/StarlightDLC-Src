@@ -66,6 +66,7 @@ import com.isusdlc.systems.modules.modules.other.RotateTeacher;
 import com.isusdlc.systems.modules.modules.other.Sounds;
 import com.isusdlc.systems.modules.modules.other.SpawnBind;
 import com.isusdlc.systems.modules.modules.other.SpecBind;
+import com.isusdlc.systems.modules.modules.other.YouTubeModule;
 import com.isusdlc.systems.modules.modules.other.UnHook;
 import com.isusdlc.systems.modules.modules.other.AutoAppleFarm;
 import com.isusdlc.systems.modules.modules.other.ClientUsers;
@@ -108,6 +109,7 @@ import com.isusdlc.systems.modules.modules.visuals.Prediction;
 import com.isusdlc.systems.modules.modules.visuals.Removals;
 import com.isusdlc.systems.modules.modules.visuals.SwingAnimation;
 import com.isusdlc.systems.modules.modules.visuals.TNTTimer;
+import com.isusdlc.systems.modules.modules.visuals.HitFX;
 import com.isusdlc.systems.modules.modules.visuals.TargetESP;
 import com.isusdlc.systems.modules.modules.visuals.ViewModel;
 import com.isusdlc.systems.modules.modules.visuals.World;
@@ -134,6 +136,7 @@ import ru.kotopushka.compiler.sdk.annotations.CompileBytecode;
 
 public class ModuleManager {
    private final List<Module> modules = new ArrayList<>();
+   private final java.util.Map<Class<?>, Module> moduleClassCache = new java.util.concurrent.ConcurrentHashMap<>();
    private final EventListener<ClientPlayerTickEvent> tickListener;
    private final EventListener<HudRenderEvent> moduleWidgetRenderer;
    private final EventListener<KeyPressEvent> onKeyPress = event -> {
@@ -202,6 +205,8 @@ public class ModuleManager {
       this.register(new Interface());
       this.register(new HitEffect());
       this.register(new TargetESP());
+      this.register(new HitFX());
+      this.register(new YouTubeModule());
       this.register(new CustomFog());
       this.register(new AspectRatio());
       this.register(new Zoom());
@@ -294,6 +299,7 @@ public class ModuleManager {
 
    public void register(BaseModule module) {
       this.modules.add(module);
+      this.moduleClassCache.put(module.getClass(), module);
    }
 
    public <T extends Module> T getModule(String name) {
@@ -305,15 +311,16 @@ public class ModuleManager {
    }
 
    public <T extends Module> T getModule(Class<T> clazz) {
-      return (T)this.modules
-         .stream()
-         .filter(module -> module.getClass().equals(clazz))
-         .findFirst()
-         .orElseThrow(() -> new UnknownModuleException(clazz.getSimpleName()));
+      Module module = this.moduleClassCache.get(clazz);
+      if (module == null) {
+         throw new UnknownModuleException(clazz.getSimpleName());
+      }
+
+      return (T)module;
    }
 
    public <T extends Module> T getModuleSafe(Class<T> clazz) {
-      return (T)this.modules.stream().filter(module -> module.getClass().equals(clazz)).findFirst().orElse(null);
+      return (T)this.moduleClassCache.get(clazz);
    }
 
    public void disableAllModules() {

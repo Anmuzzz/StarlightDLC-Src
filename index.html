@@ -52,6 +52,9 @@
       transition: transform 0.15s ease, background 0.15s ease;
       mix-blend-mode: difference;
     }
+    @media (max-width: 768px), (pointer: coarse) {
+      .cursor { mix-blend-mode: normal; }
+    }
     .cursor-dot {
       width: 6px; height: 6px;
       background: var(--accent);
@@ -1081,11 +1084,12 @@
     <div class="download-card reveal-scale">
       <div class="download-badge"><span class="dot"></span> Бесплатно • Прямое скачивание</div>
       <h2>Скачать Starlight DLC</h2>
-      <p class="subtitle">Бесплатно и без регистрации — последняя версия, мгновенная загрузка.</p>
+      <p class="subtitle">Бесплатно и без регистрации — <span data-release-version>2.5.5-beta</span>, мгновенная загрузка.</p>
       <div class="download-meta">
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> 1.21.4</span>
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Без потери FPS</span>
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Приватные bypass</span>
+        <span data-release-size>23 МБ</span>
       </div>
       <button class="btn-download cursor-hover" id="btnDownload" onclick="handleFreeDownload()">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1210,11 +1214,13 @@
 
     // ============ THREE.JS ============
     const canvas = document.getElementById('three-canvas');
+    const isMobile = window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+    let pixelRatioCap = isMobile ? 1 : 1.5;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !isMobile, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap));
 
     const ambientLight = new THREE.AmbientLight(0xF59E0B, 0.35);
     scene.add(ambientLight);
@@ -1235,7 +1241,7 @@
     const objs = [];
 
     // Torus Knot
-    const tk = new THREE.Mesh(new THREE.TorusKnotGeometry(2.2, 0.5, 128, 16), wireGold);
+    const tk = new THREE.Mesh(new THREE.TorusKnotGeometry(2.2, 0.5, isMobile ? 48 : 72, isMobile ? 10 : 12), wireGold);
     tk.position.set(6, 2, -6);
     scene.add(tk);
     objs.push({ m: tk, s: 0.004, a: 'xy' });
@@ -1260,14 +1266,14 @@
     objs.push({ m: dod, s: 0.003, a: 'xy' });
 
     // Sphere wireframe
-    const sph = new THREE.Mesh(new THREE.SphereGeometry(2.8, 18, 18), wireYellow.clone());
+    const sph = new THREE.Mesh(new THREE.SphereGeometry(2.8, 12, 12), wireYellow.clone());
     sph.material.opacity = 0.05;
     sph.position.set(0, 0, -12);
     scene.add(sph);
     objs.push({ m: sph, s: 0.001, a: 'xy' });
 
     // Torus
-    const tor = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.25, 16, 100), wireOrange.clone());
+    const tor = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.25, 10, 60), wireOrange.clone());
     tor.material.opacity = 0.1;
     tor.position.set(-4, 3, -5);
     scene.add(tor);
@@ -1292,7 +1298,7 @@
     objs.push({ m: star, s: 0.008, a: 'xyz' });
 
     // Floating cubes
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 10; i++) {
       const sz = Math.random() * 0.3 + 0.08;
       const mat = [wireGold, wireOrange, wireYellow][Math.floor(Math.random() * 3)].clone();
       mat.opacity = Math.random() * 0.12 + 0.04;
@@ -1309,7 +1315,7 @@
     }
 
     // Particles
-    const pCount = 400;
+    const pCount = 150;
     const pGeo = new THREE.BufferGeometry();
     const pPos = new Float32Array(pCount * 3);
     const pColors = new Float32Array(pCount * 3);
@@ -1341,13 +1347,39 @@
 
     let rafId = null;
     let isVisible = true;
+    let canvasVisible = true;
     document.addEventListener('visibilitychange', () => {
       isVisible = !document.hidden;
-      if (isVisible && !rafId) animate();
+      if (canRender() && !rafId) animate();
     });
 
+    // Пауза рендера, когда canvas не в зоне видимости
+    new IntersectionObserver(entries => {
+      canvasVisible = entries[0].isIntersecting;
+      if (canRender() && !rafId) animate();
+    }, { threshold: 0 }).observe(canvas);
+
+    function canRender() { return isVisible && canvasVisible; }
+
+    // Адаптивное качество: если кадры дороже ~22мс, плавно снижаем pixelRatio
+    let frameTimeEma = 16.7;
+    let lastFrameTime = performance.now();
+    function adaptQuality(deltaMs) {
+      if (deltaMs > 250) { lastFrameTime = performance.now(); return; }  // вкладка спала — не штрафуем
+      frameTimeEma += (deltaMs - frameTimeEma) * 0.05;
+      if (frameTimeEma > 24 && pixelRatioCap > 0.75) {
+        pixelRatioCap = Math.max(0.75, pixelRatioCap - 0.25);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap));
+        frameTimeEma = 16.7;
+      }
+    }
+
     function animate() {
-      if (!isVisible) { rafId = null; return; }
+      if (!canRender()) { rafId = null; return; }
+      const now = performance.now();
+      const deltaMs = now - lastFrameTime;
+      lastFrameTime = now;
+      adaptQuality(deltaMs);
       rafId = requestAnimationFrame(animate);
       const t = Date.now() * 0.001;
       objs.forEach(o => {
@@ -1371,7 +1403,7 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, pixelRatioCap));
     });
 
     // ============ GSAP ============
@@ -1422,24 +1454,58 @@
       gsap.to('.hero-buttons', { y: -20, scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 } });
     }
 
-    // ============ FREE DOWNLOAD ============
-    const DOWNLOAD_URL = 'starlightdlc.jar'; // положи jar рядом с index.html или замени на прямую ссылку
+    // ============ FREE DOWNLOAD (GitHub Releases) ============
+    const REPO = 'Anmuzzz/StarlightDLC-Src';
+    const DOWNLOAD_URL = 'starlightdlc.jar'; // фолбэк, если API релизов недоступен
+    let releaseJarUrl = null;
+
+    function formatReleaseVersion(tag) {
+      return tag.replace(/^v/, '');
+    }
+
+    async function loadLatestRelease() {
+      try {
+        const res = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest', {
+          headers: { 'Accept': 'application/vnd.github+json' }
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const release = await res.json();
+        const jar = (release.assets || []).find(a => a.name.endsWith('.jar') && !a.name.includes('sources'));
+        if (!jar) throw new Error('jar asset not found in ' + release.tag_name);
+
+        releaseJarUrl = jar.browser_download_url;
+        document.querySelectorAll('[data-release-version]').forEach(el => {
+          el.textContent = formatReleaseVersion(release.tag_name);
+        });
+        document.querySelectorAll('[data-release-size]').forEach(el => {
+          el.textContent = (jar.size / 1048576).toFixed(1) + ' MB';
+        });
+      } catch (err) {
+        console.warn('[Release] не удалось получить релиз, остаётся фолбэк:', err);
+      }
+    }
+
     function handleFreeDownload() {
       const btn = document.getElementById('btnDownload');
       const txt = document.getElementById('btnDownloadText');
+      const url = releaseJarUrl || DOWNLOAD_URL;
       if (btn) { btn.disabled = true; if (txt) txt.textContent = 'Загрузка...'; }
       const a = document.createElement('a');
-      a.href = DOWNLOAD_URL;
-      a.download = 'starlightdlc.jar';
+      a.href = url;
+      a.download = releaseJarUrl ? 'starlightdlc.jar' : '';
+      a.target = '_blank';
+      a.rel = 'noopener';
       document.body.appendChild(a);
       a.click();
       a.remove();
       // fallback: открыть в новой вкладке если браузер блокирует download
       setTimeout(() => {
-        window.open(DOWNLOAD_URL, '_blank', 'noopener');
+        window.open(url, '_blank', 'noopener');
         if (btn) { btn.disabled = false; if (txt) txt.textContent = 'Скачать бесплатно'; }
       }, 500);
     }
+
+    loadLatestRelease();
 
     // ============ FAQ ============
     document.querySelectorAll('.faq-q').forEach(btn => {

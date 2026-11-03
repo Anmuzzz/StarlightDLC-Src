@@ -22,6 +22,7 @@ public final class MsdfFont {
    private final Map<Integer, MsdfGlyph> glyphs;
    private final Map<Integer, Map<Integer, Float>> kernings;
    private final ConcurrentHashMap<Long, Float> widthCache = new ConcurrentHashMap<>();
+   private final ConcurrentHashMap<Float, Font> fontCache = new ConcurrentHashMap<>();
 
    private MsdfFont(
       String name,
@@ -134,7 +135,8 @@ public final class MsdfFont {
    }
 
    public Font getFont(float size) {
-      return new Font(this, size);
+      // Font неизменяем — кэшируем обёртку, чтобы HUD не аллоцировал её десятки раз за кадр
+      return this.fontCache.computeIfAbsent(size, s -> new Font(this, s));
    }
 
    public String getName() {

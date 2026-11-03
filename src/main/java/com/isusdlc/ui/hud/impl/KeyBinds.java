@@ -147,7 +147,7 @@ public class KeyBinds extends HudList {
          return false;
       }
 
-      return !elegant.getInstance().getModuleManager().getModules().stream().filter(module -> module.isEnabled() && module.getKey() != -1).toList().isEmpty()
+      return elegant.getInstance().getModuleManager().getModules().stream().anyMatch(module -> module.isEnabled() && module.getKey() != -1)
          || mc.currentScreen instanceof ChatScreen
          || mc.currentScreen instanceof HudEditorScreen
          || this.alwaysDisplay.isEnabled();

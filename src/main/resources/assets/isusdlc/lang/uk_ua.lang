@@ -555,3 +555,5 @@ modules.descriptions.pvp_ai=Показує шанси на перемогу та
 modules.settings.pvp_ai.damage_indicator=Індикатор шкоди
 modules.settings.pvp_ai.damage_size=Розмір шкоди
 modules.settings.pvp_ai.damage_color=Колір шкоди
+modules.settings.target_esp.mode.gradient=Градієнт
+modules.settings.target_esp.mode.halo=Гало

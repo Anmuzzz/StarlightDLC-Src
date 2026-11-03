@@ -553,3 +553,5 @@ modules.descriptions.pvp_ai=Shows win chances and damage indicators
 modules.settings.pvp_ai.damage_indicator=Damage Indicator
 modules.settings.pvp_ai.damage_size=Damage Size
 modules.settings.pvp_ai.damage_color=Damage Color
+modules.settings.target_esp.mode.gradient=Gradient
+modules.settings.target_esp.mode.halo=Halo

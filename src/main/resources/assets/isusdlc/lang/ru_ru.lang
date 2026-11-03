@@ -627,3 +627,5 @@ modules.settings.pvp_ai.damage_indicator=Индикатор урона
 modules.settings.pvp_ai.damage_size=Размер урона
 modules.settings.pvp_ai.damage_color=Цвет урона
 modules.descriptions.tape_mouse=Автоматически кликает кнопкой мыши с заданным интервалом
+modules.settings.target_esp.mode.gradient=Градиент
+modules.settings.target_esp.mode.halo=Гало

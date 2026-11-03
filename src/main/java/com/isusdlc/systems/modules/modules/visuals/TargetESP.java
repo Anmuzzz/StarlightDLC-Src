@@ -65,6 +65,8 @@ public class TargetESP extends BaseModule {
    private final ModeSetting.Value marker = new ModeSetting.Value(this.mode, "modules.settings.target_esp.mode.marker");
    private final ModeSetting.Value ring = new ModeSetting.Value(this.mode, "modules.settings.target_esp.mode.ring");
    private final ModeSetting.Value pigs = new ModeSetting.Value(this.mode, "modules.settings.target_esp.mode.pigs");
+   private final ModeSetting.Value gradient = new ModeSetting.Value(this.mode, "modules.settings.target_esp.mode.gradient");
+   private final ModeSetting.Value halo = new ModeSetting.Value(this.mode, "modules.settings.target_esp.mode.halo");
    private final ColorSetting colorTarget = new ColorSetting(this, "color").color(Colors.ACCENT);
    private final BooleanSetting changeColorOnDamage = new BooleanSetting(this, "modules.settings.target_esp.change_color_on_damage").enable();
    private final SliderSetting speed = new SliderSetting(this, "modules.settings.target_esp.speed").min(0.1F).max(5.0F).step(0.1F).currentValue(0.5F);
@@ -175,6 +177,10 @@ public class TargetESP extends BaseModule {
                this.drawMarker(ms, this.prevTarget);
             } else if (this.crystals.isSelected()) {
                this.drawCrystals(ms, this.prevTarget);
+            } else if (this.gradient.isSelected()) {
+               this.drawGradientCircle(ms, this.prevTarget);
+            } else if (this.halo.isSelected()) {
+               this.drawHalo(ms, this.prevTarget);
             } else if (this.ring.isSelected()) {
                this.drawRing(ms, this.prevTarget);
             } else if (this.pigs.isSelected()) {
@@ -706,6 +712,102 @@ public class TargetESP extends BaseModule {
       RenderSystem.enableCull();
       RenderSystem.disableBlend();
       RenderSystem.depthMask(true);
+   }
+
+   /** Плоский градиентный диск под целью (стиль LiquidBounce "Circle"): яркий край, плавное затухание к центру. */
+   private void drawGradientCircle(MatrixStack ms, LivingEntity target) {
+      float alpha = this.animation.getValue();
+      if (alpha <= 0.01F) return;
+      ColorRGBA color = this.getTargetColor();
+      Vec3d camPos = mc.gameRenderer.getCamera().getPos();
+      float radius = target.getWidth() * 0.9F + 0.3F;
+      int cr = (int) (color.getRed() * 255.0F);
+      int cg = (int) (color.getGreen() * 255.0F);
+      int cb = (int) (color.getBlue() * 255.0F);
+
+      ms.push();
+      ms.translate(target.getX() - camPos.x, target.getY() - camPos.y + 0.02, target.getZ() - camPos.z);
+      RenderSystem.enableBlend();
+      RenderSystem.defaultBlendFunc();
+      RenderSystem.disableCull();
+      RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+      Matrix4f matrix = ms.peek().getPositionMatrix();
+      BufferBuilder buffer = RenderSystem.renderThreadTesselator().begin(DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+      buffer.vertex(matrix, 0.0F, 0.0F, 0.0F).color(cr, cg, cb, 0);
+      int segments = 48;
+      for (int i = 0; i <= segments; i++) {
+         double angle = Math.PI * 2.0 * i / segments;
+         buffer.vertex(matrix, (float) (Math.cos(angle) * radius), 0.0F, (float) (Math.sin(angle) * radius))
+            .color(cr, cg, cb, (int) (alpha * 110.0F));
+      }
+      BufferRenderer.drawWithGlobalProgram(buffer.end());
+      RenderSystem.enableCull();
+      ms.pop();
+   }
+
+   /** Вращающееся волновое кольцо-нимб над головой цели с бегущими огнями. */
+   private void drawHalo(MatrixStack ms, LivingEntity target) {
+      float alpha = this.animation.getValue();
+      if (alpha <= 0.01F) return;
+      ColorRGBA color = this.getTargetColor();
+      Vec3d camPos = mc.gameRenderer.getCamera().getPos();
+      float radius = target.getWidth() * 0.75F + 0.25F;
+      int cr = (int) (color.getRed() * 255.0F);
+      int cg = (int) (color.getGreen() * 255.0F);
+      int cb = (int) (color.getBlue() * 255.0F);
+      double phase = System.currentTimeMillis() % 4000L / 4000.0 * Math.PI * 2.0;
+
+      ms.push();
+      ms.translate(target.getX() - camPos.x, target.getY() + target.getHeight() + 0.35, target.getZ() - camPos.z);
+      RenderSystem.enableBlend();
+      RenderSystem.defaultBlendFunc();
+      RenderSystem.disableDepthTest();
+      RenderSystem.disableCull();
+      RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+      RenderSystem.lineWidth(2.5F);
+      Matrix4f matrix = ms.peek().getPositionMatrix();
+
+      for (int ring = 0; ring < 2; ring++) {
+         float ringRadius = radius * (ring == 0 ? 1.0F : 0.72F);
+         double ringPhase = ring == 0 ? phase : -phase * 1.35;
+         BufferBuilder buffer = RenderSystem.renderThreadTesselator().begin(DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
+         int segments = 40;
+         for (int i = 0; i <= segments; i++) {
+            double angle = Math.PI * 2.0 * i / segments;
+            float wave = (float) Math.sin(angle * 3.0 + ringPhase) * 0.05F;
+            int segmentAlpha = (int) (alpha * (ring == 0 ? 170.0F : 110.0F));
+            buffer.vertex(matrix, (float) (Math.cos(angle) * ringRadius), wave, (float) (Math.sin(angle) * ringRadius))
+               .color(cr, cg, cb, segmentAlpha);
+         }
+         BufferRenderer.drawWithGlobalProgram(buffer.end());
+      }
+
+      // бегущие огни: три ярких билборда, едущие по кольцу
+      Identifier bloom = elegant.id("textures/bloom.png");
+      RenderSystem.setShaderTexture(0, bloom);
+      RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
+      BufferBuilder dots = RenderSystem.renderThreadTesselator().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+      float dotSize = 0.14F;
+      for (int dot = 0; dot < 3; dot++) {
+         double angle = phase * 1.5 + Math.PI * 2.0 * dot / 3.0;
+         float px = (float) (Math.cos(angle) * radius);
+         float pz = (float) (Math.sin(angle) * radius);
+         float py = (float) Math.sin(angle * 3.0 + phase) * 0.05F;
+         ms.push();
+         ms.translate(px, py, pz);
+         ms.multiply(mc.gameRenderer.getCamera().getRotation());
+         Matrix4f dotMatrix = ms.peek().getPositionMatrix();
+         dots.vertex(dotMatrix, -dotSize, -dotSize, 0.0F).texture(0.0F, 1.0F).color(cr, cg, cb, (int) (alpha * 220.0F));
+         dots.vertex(dotMatrix, -dotSize, dotSize, 0.0F).texture(0.0F, 0.0F).color(cr, cg, cb, (int) (alpha * 220.0F));
+         dots.vertex(dotMatrix, dotSize, dotSize, 0.0F).texture(1.0F, 0.0F).color(cr, cg, cb, (int) (alpha * 220.0F));
+         dots.vertex(dotMatrix, dotSize, -dotSize, 0.0F).texture(1.0F, 1.0F).color(cr, cg, cb, (int) (alpha * 220.0F));
+         ms.pop();
+      }
+      BufferRenderer.drawWithGlobalProgram(dots.end());
+
+      RenderSystem.enableDepthTest();
+      RenderSystem.enableCull();
+      ms.pop();
    }
 
    @Override
