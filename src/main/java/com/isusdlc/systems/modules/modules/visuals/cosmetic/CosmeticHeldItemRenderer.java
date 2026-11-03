@@ -64,7 +64,8 @@ public final class CosmeticHeldItemRenderer {
         if (drawing && MC.player != null) {
             float max = item.getMaxUseTime(MC.player);
             float left = MC.player.getItemUseTimeLeft() - tickDelta + 1f;
-            pull = MathHelper.clamp((max - left) / Math.max(max, 1f), 0f, 1f);
+            // натяжение считается от ванильного времени зарядки лука (20 тиков), а не от max use time (72000)
+            pull = MathHelper.clamp((max - left) / 20f, 0f, 1f);
         }
 
         CosmeticManager mgr = CosmeticManager.getInstance();
@@ -133,15 +134,16 @@ public final class CosmeticHeldItemRenderer {
 
         if (MC.player == null) return;
         float mx = item.getMaxUseTime(MC.player) - (MC.player.getItemUseTimeLeft() - tickDelta + 1f);
-        float pull = MathHelper.clamp((mx * mx + mx * 2f) / 3f / 20f, 0f, 1f);
+        float g = mx / 20f;
+        float pull = MathHelper.clamp((g * g + g * 2f) / 3f, 0f, 1f);
         if (pull > 0.1f) {
             float gx = MathHelper.sin((mx - 0.1f) * 1.3f);
             float h = pull - 0.1f;
             float j = gx * h;
             matrices.translate(j * 0f, j * 0.004f, j * 0f);
+            matrices.translate(0f, 0f, pull * 0.04f);
+            matrices.scale(1f, 1f, 1f + pull * 0.2f);
+            matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(side * 45f));
         }
-        matrices.translate(0f, 0f, pull * 0.04f);
-        matrices.scale(1f, 1f, 1f + pull * 0.2f);
-        matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(side * 45f));
     }
 }

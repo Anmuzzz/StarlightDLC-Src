@@ -113,7 +113,7 @@ public class AutoBuyScreen extends Screen implements IMinecraft {
       String lower = name.toLowerCase();
       if (set.contains(lower)) set.remove(lower);
       else set.add(lower);
-      parserSettings.put(item, !set.contains(lower));
+      parserSettings.put(item, set.contains(lower));
    }
 
    public List<String> getParserEnabledItemNames() {
@@ -563,7 +563,7 @@ public class AutoBuyScreen extends Screen implements IMinecraft {
       matrices.pop();
 
       if (settingsAnimDir && progress >= 1) settingsAnimDir = false;
-      if (!settingsAnimDir && progress > 0) settingsAnimProgress = Math.max(0, progress - 0.05F);
+      if (!settingsAnimDir && settingsItem == null && progress > 0) settingsAnimProgress = Math.max(0, progress - 0.05F);
       else if (settingsAnimDir) settingsAnimProgress = Math.min(1, progress + 0.05F);
    }
 
@@ -617,7 +617,7 @@ public class AutoBuyScreen extends Screen implements IMinecraft {
                   settingsAnimatedItem = item;
                   settingsItem = null;
                   settingsAnimDir = false;
-                  settingsAnimProgress = animProgress;
+                  settingsAnimProgress = 1.0F;
                } else {
                   settingsAnimatedItem = item;
                   settingsItem = item;

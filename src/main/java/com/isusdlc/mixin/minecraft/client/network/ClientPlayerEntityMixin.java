@@ -8,6 +8,7 @@ import com.isusdlc.systems.event.impl.player.ClientPlayerTickEvent;
 import com.isusdlc.systems.event.impl.player.SlowDownEvent;
 import com.isusdlc.systems.modules.modules.player.Freelook;
 import com.isusdlc.systems.modules.modules.player.InvUtils;
+import com.isusdlc.systems.modules.modules.player.NoPush;
 import com.isusdlc.utility.interfaces.IMinecraft;
 import com.isusdlc.utility.mixins.ClientPlayerEntityAddition;
 import com.isusdlc.utility.rotations.RotationHandler;
@@ -59,6 +60,10 @@ public class ClientPlayerEntityMixin implements ClientPlayerEntityAddition, IMin
       cancellable = true
    )
    public void removePushOutFromBlocks(double x, double z, CallbackInfo ci) {
+      NoPush noPush = elegant.getInstance().getModuleManager().getModuleSafe(NoPush.class);
+      if (noPush != null && noPush.isEnabled() && noPush.getBlocks().isEnabled()) {
+         ci.cancel();
+      }
    }
 
    @Inject(

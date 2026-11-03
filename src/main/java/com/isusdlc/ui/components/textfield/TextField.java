@@ -75,7 +75,7 @@ public class TextField extends CustomComponent implements IMinecraft {
 
          for (TextField.TypedText typedText : this.texts) {
             String text = String.valueOf(typedText.type);
-            if (context.getMouseX() < this.x + this.xPos + v + this.font.width(text) + this.font.width(text) / 2.0F) {
+            if (context.getMouseX() < this.x + this.xPos + v + this.font.width(text) / 2.0F) {
                current = this.texts.indexOf(typedText);
                break;
             }
@@ -232,7 +232,7 @@ public class TextField extends CustomComponent implements IMinecraft {
 
             for (TextField.TypedText typedText : this.texts) {
                String text = String.valueOf(typedText.type);
-               if (mouseX < this.x + this.xPos + offset + this.font.width(text) + this.font.width(text) / 2.0F) {
+               if (mouseX < this.x + this.xPos + offset + this.font.width(text) / 2.0F) {
                   newCursor = this.texts.indexOf(typedText);
                   break;
                }

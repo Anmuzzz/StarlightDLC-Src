@@ -73,9 +73,9 @@ public class IRCScreen extends Screen implements IMinecraft {
         int maxLines = (height - 90) / lineHeight;
 
         int startIndex = Math.max(0, messages.size() - maxLines - scrollOffset);
-        for (int i = startIndex; i < messages.size(); i++) {
+        for (int i = messages.size() - 1; i >= startIndex; i--) {
             context.drawText(textRenderer, messages.get(i), 10, y, textColor, false);
-            y += lineHeight;
+            y -= lineHeight;
         }
 
         inputField.render(context, mouseX, mouseY, delta);

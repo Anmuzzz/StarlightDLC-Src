@@ -36,6 +36,15 @@ public class Zoom extends BaseModule {
          }
       }
    };
+   private final EventListener<com.isusdlc.systems.event.impl.window.MouseEvent> onMouseButton = event -> {
+      if (this.zoomKey.isKey(event.getButton()) && mc.currentScreen == null) {
+         if (event.getAction() == 1) {
+            this.isZooming = true;
+         } else if (event.getAction() == 0) {
+            this.isZooming = false;
+         }
+      }
+   };
 
    @Override
    public void onEnable() {

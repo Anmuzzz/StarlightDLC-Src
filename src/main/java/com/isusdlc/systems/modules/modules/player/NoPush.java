@@ -11,4 +11,16 @@ public class NoPush extends BaseModule {
     private final BooleanSetting water = new BooleanSetting(this, "Вода").enabled(true);
     private final BooleanSetting players = new BooleanSetting(this, "Игроки").enabled(true);
     private final BooleanSetting blocks = new BooleanSetting(this, "Блоки").enabled(true);
+
+    public BooleanSetting getWater() {
+        return water;
+    }
+
+    public BooleanSetting getPlayers() {
+        return players;
+    }
+
+    public BooleanSetting getBlocks() {
+        return blocks;
+    }
 }

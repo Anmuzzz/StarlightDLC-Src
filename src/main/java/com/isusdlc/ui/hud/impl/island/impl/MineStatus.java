@@ -29,7 +29,7 @@ public class MineStatus extends TimerStatus implements IMinecraft {
          List<ArmorStandEntity> nearbyStands = new ArrayList<>();
 
          for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof ArmorStandEntity armorStand && this.near(armorStand, new Vec3d(-52.0, 87.0, 3.0))) {
+            if (entity instanceof ArmorStandEntity armorStand && this.near(armorStand, this.vec)) {
                nearbyStands.add(armorStand);
             }
          }

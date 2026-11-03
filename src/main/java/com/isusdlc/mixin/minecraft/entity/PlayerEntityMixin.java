@@ -46,7 +46,12 @@ public class PlayerEntityMixin {
              cancellable = true
     )
     private void removePushFromFluids(CallbackInfoReturnable<Boolean> cir) {
-   }
+      com.isusdlc.systems.modules.modules.player.NoPush noPush =
+         elegant.getInstance().getModuleManager().getModuleSafe(com.isusdlc.systems.modules.modules.player.NoPush.class);
+      if (noPush != null && noPush.isEnabled() && noPush.getWater().isEnabled()) {
+         cir.setReturnValue(false);
+      }
+    }
 
    @Redirect(
       method = {"travel(Lnet/minecraft/util/math/Vec3d;)V"},

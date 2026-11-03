@@ -131,7 +131,7 @@ public class ModeSettingComponent extends MenuSettingComponent<ModeSetting> {
          for (ModeSetting.Value value : this.setting.getValues()) {
             if (!value.isHidden()) {
                boolean hover = GuiUtility.isHovered(
-                  (double)(this.x - 1.0F), (double)(this.y + 20.0F + offset), (double)(this.width - 2.0F), 12.0, mouseX, mouseY
+                  (double)(this.x + 8.0F), (double)(this.y + 21.0F + offset), (double)(this.width - 16.0F), 12.0, mouseX, mouseY
                );
                if (hover) {
                   value.select();

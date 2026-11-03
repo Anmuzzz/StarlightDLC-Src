@@ -189,7 +189,7 @@ public class SelectSettingComponent extends MenuSettingComponent<SelectSetting> 
 
          for (SelectSetting.Value value : this.setting.getValues()) {
             if (!value.isHidden()) {
-               boolean hover = GuiUtility.isHovered((double)(x - 1.0F), (double)(y + 20.0F + offset), (double)(this.width - 2.0F), 12.0, mouseX, mouseY);
+               boolean hover = GuiUtility.isHovered((double)(x - 1.0F), (double)(y + 20.0F + offset), (double)(this.width - 16.0F), 12.0, mouseX, mouseY);
                if (GuiUtility.isHovered((double)x, (double)(y + 22.0F + offset), 17.0, 10.0, mouseX, mouseY) && this.setting.isDraggable()) {
                   this.dragging = value;
                } else if (hover) {

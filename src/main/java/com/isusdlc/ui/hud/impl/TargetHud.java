@@ -215,9 +215,11 @@ public class TargetHud extends HudElement {
    @Override
    public void onMouseClicked(double mouseX, double mouseY, MouseButton button) {
       if (GuiUtility.isHovered((double)(this.x + 30.0F), (double)(this.y + 3.0F + 6.0F * this.content.getValue()), 60.0, 6.0, mouseX, mouseY)) {
-         TextUtility.copyText(mc.player.getName().getString());
-         this.copyTimer.reset();
-         this.copied = true;
+         if (this.target != null) {
+            TextUtility.copyText(this.target.getName().getString());
+            this.copyTimer.reset();
+            this.copied = true;
+         }
       } else {
          super.onMouseClicked(mouseX, mouseY, button);
       }

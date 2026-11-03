@@ -47,11 +47,12 @@ public abstract class ChatInputSuggestorMixin {
             try {
                if (this.pendingSuggestions.isDone() && !this.pendingSuggestions.get().isEmpty() && this.window == null) {
                   this.show(false);
-                  ci.cancel();
                }
             } catch (InterruptedException | ExecutionException var3x) {
             }
          });
+         // отменяем остаток ванильного refresh(), чтобы не показывалось её окно подсказок
+         ci.cancel();
       }
    }
 }

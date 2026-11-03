@@ -13,10 +13,11 @@ public final class ItemRender implements IMinecraft {
         context.getMatrices().translate(centerX, centerY, 0);
         context.getMatrices().scale(scale, scale, scale);
         int size = 16;
-        context.drawItem(stack, -size / 2, -size / 2);
         if (alpha < 255) {
             RenderSystem.setShaderColor(1, 1, 1, alpha / 255.0f);
         }
+        context.drawItem(stack, -size / 2, -size / 2);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
         context.getMatrices().pop();
     }
 
@@ -28,10 +29,11 @@ public final class ItemRender implements IMinecraft {
         context.getMatrices().push();
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, scale);
-        context.drawItem(stack, 0, 0);
         if (alphaFactor < 1.0f) {
             RenderSystem.setShaderColor(1, 1, 1, alphaFactor);
         }
+        context.drawItem(stack, 0, 0);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
         context.getMatrices().pop();
     }
 
@@ -41,10 +43,11 @@ public final class ItemRender implements IMinecraft {
         context.getMatrices().push();
         context.getMatrices().translate(x, y, 0);
         context.getMatrices().scale(scale, scale, scale);
-        context.drawItem(stack, 0, 0);
         if (alphaFactor < 1.0f) {
             RenderSystem.setShaderColor(1, 1, 1, alphaFactor);
         }
+        context.drawItem(stack, 0, 0);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
         context.getMatrices().pop();
     }
 

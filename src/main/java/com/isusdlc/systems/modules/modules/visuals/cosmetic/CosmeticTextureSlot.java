@@ -24,6 +24,7 @@ final class CosmeticTextureSlot {
 
     private boolean loaded;
     private JsonObject textureJson;
+    private boolean sizeFromJson;
 
     CosmeticTextureSlot(int index, Identifier id, int width, int height, String fileName) {
         this.index = index;
@@ -58,8 +59,12 @@ final class CosmeticTextureSlot {
     }
 
     static CosmeticTextureSlot fromJson(int index, String modelKey, JsonObject texture) {
-        int w = texture.has("width") ? texture.get("width").getAsInt() : 64;
-        int h = texture.has("height") ? texture.get("height").getAsInt() : 64;
+        // UV-координаты в bbmodel заданы в UV-пространстве текстуры (uv_width/uv_height),
+        // которое может отличаться от размера картинки (HD-текстуры)
+        int w = texture.has("uv_width") ? texture.get("uv_width").getAsInt()
+                : (texture.has("width") ? texture.get("width").getAsInt() : 64);
+        int h = texture.has("uv_height") ? texture.get("uv_height").getAsInt()
+                : (texture.has("height") ? texture.get("height").getAsInt() : 64);
         String name = texture.has("name") ? texture.get("name").getAsString() : "tex" + index;
         Identifier id = Identifier.of(
                 NAME.toLowerCase(),
@@ -67,6 +72,8 @@ final class CosmeticTextureSlot {
         );
         CosmeticTextureSlot slot = new CosmeticTextureSlot(index, id, w, h, name);
         slot.textureJson = texture;
+        slot.sizeFromJson = texture.has("uv_width") || texture.has("uv_height")
+                || texture.has("width") || texture.has("height");
         return slot;
     }
 
@@ -139,8 +146,10 @@ final class CosmeticTextureSlot {
 
     private void register(MinecraftClient mc, InputStream is) throws IOException {
         NativeImage image = NativeImage.read(is);
-        width = Math.max(image.getWidth(), 1);
-        height = Math.max(image.getHeight(), 1);
+        if (!sizeFromJson) {
+            width = Math.max(image.getWidth(), 1);
+            height = Math.max(image.getHeight(), 1);
+        }
         NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
         mc.getTextureManager().registerTexture(id, texture);
         loaded = true;

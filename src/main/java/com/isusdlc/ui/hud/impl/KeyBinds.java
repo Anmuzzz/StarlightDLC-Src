@@ -59,7 +59,7 @@ public class KeyBinds extends HudList {
    protected void renderComponent(UIContext context) {
       Font font = Fonts.REGULAR.getFont(7.0F);
       List<Module> modules = new ArrayList<>(elegant.getInstance().getModuleManager().getModules());
-      if (this.lastSize == modules.size()) {
+      if (this.lastSize != modules.size()) {
          modules.sort(Comparator.comparingDouble(m -> font.width(m.getName())));
          this.lastSize = modules.size();
       }

@@ -46,7 +46,14 @@ public final class CosmeticBbAnimation {
             if (name.startsWith("--") || name.isBlank()) continue;
 
             float length = obj.has("length") ? obj.get("length").getAsFloat() : 1f;
-            boolean loop = !obj.has("loop") || obj.get("loop").getAsBoolean();
+            // в bbmodel "loop" — строковая перечисление: "loop", "once" или "hold"
+            boolean loop = true;
+            if (obj.has("loop")) {
+                JsonElement loopEl = obj.get("loop");
+                loop = loopEl.isJsonPrimitive() && loopEl.getAsJsonPrimitive().isString()
+                    ? "loop".equalsIgnoreCase(loopEl.getAsString())
+                    : loopEl.getAsBoolean();
+            }
             CosmeticBbAnimation anim = new CosmeticBbAnimation(name, length, loop);
 
             if (obj.has("animators")) {

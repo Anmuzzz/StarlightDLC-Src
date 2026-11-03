@@ -41,7 +41,7 @@ public class MouseMixin implements IMinecraft {
       at = {@At("HEAD")}
    )
    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-      if (action == 1) {
+      if (action == 1 || action == 0) {
          elegant.getInstance().getEventManager().triggerEvent(new MouseEvent(button, action));
       }
    }

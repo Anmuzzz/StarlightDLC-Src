@@ -18,7 +18,7 @@ public class CosmeticModel {
     private final String description;
     private final String accentColor;
     private final String folderName;
-    private final CosmeticType type;
+    private CosmeticType type;
     private final File externalDirectory;
     @Setter private String source = "Built-in";
 
@@ -53,7 +53,10 @@ public class CosmeticModel {
     }
 
     public CosmeticModel withType(CosmeticType newType) {
-        return new CosmeticModel(id, name, description, accentColor, folderName, newType, externalDirectory);
+        this.type = newType;
+        this.resetTexture();
+        this.postProcess();
+        return this;
     }
 
     public void resetTexture() {
@@ -747,16 +750,8 @@ public class CosmeticModel {
                     float v1 = uv.get(1).getAsFloat();
                     float u2 = uv.get(2).getAsFloat();
                     float v2 = uv.get(3).getAsFloat();
-                    if (u2 < u1) {
-                        float t = u1;
-                        u1 = u2;
-                        u2 = t;
-                    }
-                    if (v2 < v1) {
-                        float t = v1;
-                        v1 = v2;
-                        v2 = t;
-                    }
+                    // реверс диапазона (u2 < u1 / v2 < v1) — это зеркалирование грани в Blockbench,
+                    // не нормализуем: quadFace отображает u1/u2 на фиксированные углы квада
                     faces[i] = new CosmeticCube.CubeFace(u1, v1, u2, v2, tex);
                 }
             }

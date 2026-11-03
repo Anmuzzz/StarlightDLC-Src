@@ -64,7 +64,6 @@ public class JumpCircle extends BaseModule {
       float maxTime = time.getCurrentValue();
 
       matrices.push();
-      var buf = Tessellator.getInstance().begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
 
       for (CircleData c : circles) {
          float progress = (System.currentTimeMillis() - c.birth) / maxTime;
@@ -75,6 +74,8 @@ public class JumpCircle extends BaseModule {
          double y = c.pos.y - cam.y;
          double z = c.pos.z - cam.z;
 
+         // отдельный буфер на круг, иначе LINE_STRIP свяжет последний круг со следующим линией
+         var buf = Tessellator.getInstance().begin(VertexFormat.DrawMode.LINE_STRIP, VertexFormats.POSITION_COLOR);
          int segs = 48;
          for (int i = 0; i <= segs; i++) {
             double angle = Math.PI * 2 * i / segs;
@@ -83,9 +84,9 @@ public class JumpCircle extends BaseModule {
             buf.vertex(matrices.peek().getPositionMatrix(), (float) x + cos * rad, (float) y, (float) z + sin * rad)
                .color(r, g, b2, (int) (alpha * 255));
          }
+         BufferRenderer.drawWithGlobalProgram(buf.end());
       }
 
-      BufferRenderer.drawWithGlobalProgram(buf.end());
       matrices.pop();
    };
 

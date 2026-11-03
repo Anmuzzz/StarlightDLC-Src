@@ -73,7 +73,7 @@ public class DynamicIsland extends HudElement implements IMinecraft, IScaledReso
       String time = TextUtility.getCurrentTime();
       if (this.timer.finished(500L)) {
          float pixelX = mc.getWindow().getWidth() / 2.0F;
-         float pixelY = mc.getWindow().getHeight() - (this.y + 5.0F);
+         float pixelY = mc.getWindow().getHeight() - (this.y + 5.0F) * (float)mc.getWindow().getScaleFactor();
          ColorRGBA pixel = ColorRGBA.fromPixel(pixelX, pixelY);
          boolean check = (pixel.getRed() + pixel.getGreen() + pixel.getBlue()) / 3.0F > 70.0F;
          this.useDark = check;

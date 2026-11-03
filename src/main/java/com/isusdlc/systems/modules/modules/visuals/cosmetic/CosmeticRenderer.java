@@ -67,11 +67,6 @@ public class CosmeticRenderer {
             }
 
             BufferRenderer.drawWithGlobalProgram(buf.end());
-
-            RenderSystem.enableCull();
-            RenderSystem.disableBlend();
-            RenderSystem.depthMask(true);
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         } catch (Exception ignored) {
             if (buf != null) {
                 try {
@@ -80,6 +75,10 @@ public class CosmeticRenderer {
                 }
             }
         } finally {
+            RenderSystem.enableCull();
+            RenderSystem.disableBlend();
+            RenderSystem.depthMask(true);
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
             matrices.pop();
         }
     }

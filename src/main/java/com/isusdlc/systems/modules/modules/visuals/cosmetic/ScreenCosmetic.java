@@ -226,8 +226,8 @@ public class ScreenCosmetic extends Screen implements IMinecraft, IWindow {
         float modelY = workTop + workH * 0.70f;
 
         ScissorUtility.push(ms, x + 4f, workTop, w - 8f, workH);
+        ms.push();
         try {
-            ms.push();
             ms.translate(cx, modelY, 200f);
             ms.scale(modelScale, modelScale, modelScale);
             ms.multiply(new Quaternionf().rotationY((float) Math.toRadians(previewRotY)));
@@ -256,10 +256,11 @@ public class ScreenCosmetic extends Screen implements IMinecraft, IWindow {
                             LightmapTextureManager.MAX_LIGHT_COORDINATE,
                             OverlayTexture.DEFAULT_UV, true, CosmeticRenderSpace.PREVIEW);
             consumers.draw();
-            ms.pop();
         } catch (Exception ignored) {
+        } finally {
+            ms.pop();
+            ScissorUtility.pop();
         }
-        ScissorUtility.pop();
 
         Font hintFont = Fonts.MEDIUM.getFont(4.5f);
         ctx.drawCenteredText(hintFont, "drag to rotate",

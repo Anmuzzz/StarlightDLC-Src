@@ -41,17 +41,17 @@ public class Interface extends BaseModule {
    private final ModeSetting language = new ModeSetting(this, "modules.settings.interface.language");
    private final Animation liquidGlassAnim = new Animation(500L, Easing.BOTH_CUBIC);
    public final ColorSetting minimalismMainColor = new ColorSetting(
-         this, "modules.settings.interface.minimalism.mainColor", () -> this.minimalism.isSelected()
+         this, "modules.settings.interface.minimalism.mainColor", () -> !this.minimalism.isSelected()
       )
       .color(new ColorRGBA(151.0F, 71.0F, 255.0F, 255.0F))
       .alpha(false);
    public final ColorSetting liquidGlassColor = new ColorSetting(
-         this, "modules.settings.interface.liquidGlass.glassColor", () -> this.liquidGlass.isSelected()
+         this, "modules.settings.interface.liquidGlass.glassColor", () -> !this.liquidGlass.isSelected()
       )
       .color(new ColorRGBA(200.0F, 220.0F, 255.0F, 100.0F))
       .alpha(true);
    public final ColorSetting liquidClientColor = new ColorSetting(
-         this, "modules.settings.interface.liquidGlass.clientColor", () -> this.liquidGlass.isSelected()
+         this, "modules.settings.interface.liquidGlass.clientColor", () -> !this.liquidGlass.isSelected()
       )
       .color(new ColorRGBA(151.0F, 71.0F, 255.0F, 255.0F))
       .alpha(true);

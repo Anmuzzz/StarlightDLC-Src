@@ -73,7 +73,7 @@ public class ChangelogScreen extends CustomScreen implements IMinecraft {
                 textY += 4;
                 continue;
             }
-            boolean isHeader = line.equals("1.2.0");
+            boolean isHeader = line.equals("2.0.0-Alpha");
             Font font = isHeader ? Fonts.BOLD.getFont(9) : textFont;
             context.drawText(font, line, x + 16, textY, isHeader ? Colors.getAccentColor() : Colors.getTextColor());
             textY += font.height() + 2;
