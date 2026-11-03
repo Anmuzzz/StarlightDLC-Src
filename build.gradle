@@ -37,7 +37,7 @@ dependencies {
     // JavaFX для встроенного YouTube-плеера (WebView + медиа): Windows + Linux
     def jfxVersion = '21.0.5'
     ['win', 'linux'].each { platform ->
-        ['base', 'graphics', 'media', 'web'].each { module ->
+        ['base', 'graphics', 'media', 'web', 'swing'].each { module ->
             implementation "org.openjfx:javafx-$module:$jfxVersion:$platform"
             include "org.openjfx:javafx-$module:$jfxVersion:$platform"
         }
