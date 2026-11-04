@@ -130,13 +130,6 @@
   - Player: AutoLeave, AutoRespawn, AutoTool, GuiWalk, NoPush, MiddleClickPearl, NoDelay, FreeCamera
   - Other: AutoDuel, NoCommands, UnHook
   - Visuals: FullBright, CrossHair, NoRender, BlockESP
-- **Косметическая система** (портирована из Exosware):
-  - BBmodel-рендерер с поддержкой Blockbench-анимаций
-  - 3 вида косметики: модели, питомцы, аксессуары
-  - GUI выбора косметики с поиском и 3D-превью
-  - Mixin для замены модели игрока
-  - Mixin для замены предметов в руке (лук/меч)
-  - Встроенные модели: miku, teto, goose, howlpendragon, kaltist, repo, starhorm, simplewings, allay, birb, mothli
 - **Описания модулям**: AutoEat, Auto Sprint, Custom Fog, Interface, Prediction, Trap ESP, Waypoints
 
 ### Удалено
