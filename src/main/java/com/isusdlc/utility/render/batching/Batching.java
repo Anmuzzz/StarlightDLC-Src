@@ -10,6 +10,19 @@ import net.minecraft.client.render.VertexFormat.DrawMode;
 
 public abstract class Batching {
    protected static Batching active;
+
+   /**
+    * Скоуп авто-батчинга HUD: внутри него draw-методы CustomDrawContext
+    * собирают однотипные вызовы в батчи, а нетипичные — сбрасывают накопленное
+    * (строгий порядок слоёв сохраняется). Вне скоупа поведение прежнее.
+    */
+   public static boolean AUTO = false;
+
+   public static void flushActive() {
+      if (AUTO && active != null) {
+         active.draw();
+      }
+   }
    protected BufferBuilder builder;
 
    public Batching(VertexFormat vertexFormat) {

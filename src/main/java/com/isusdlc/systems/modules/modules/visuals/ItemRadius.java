@@ -10,6 +10,7 @@ import com.isusdlc.systems.setting.settings.BooleanSetting;
 import com.isusdlc.systems.setting.settings.ColorSetting;
 import com.isusdlc.utility.colors.ColorRGBA;
 import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.render.BufferRenderer;
@@ -28,6 +29,20 @@ import org.joml.Quaternionf;
    desc = "modules.descriptions.itemradius"
 )
 public class ItemRadius extends BaseModule {
+   private static final float[][] TRAP_VERTICES = {
+      {-2.5F, -2.0F, -2.5F}, {2.5F, -2.0F, -2.5F}, {2.5F, 2.0F, -2.5F}, {-2.5F, 2.0F, -2.5F},
+      {-2.5F, -2.0F, 2.5F}, {2.5F, -2.0F, 2.5F}, {2.5F, 2.0F, 2.5F}, {-2.5F, 2.0F, 2.5F}
+   };
+   private static final int[][] FACES = {{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
+   private static final int[][] EDGES = {{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+   private static final float[][] PANEL_VERTICES = {
+      {-1.0F, -2.0F, -2.5F}, {1.0F, -2.0F, -2.5F}, {1.0F, 2.0F, -2.5F}, {-1.0F, 2.0F, -2.5F},
+      {-1.0F, -2.0F, 2.5F}, {1.0F, -2.0F, 2.5F}, {1.0F, 2.0F, 2.5F}, {-1.0F, 2.0F, 2.5F}
+   };
+   private static final float[][] FLOOR_VERTICES = {
+      {-2.5F, -1.0F, -2.5F}, {2.5F, -1.0F, -2.5F}, {2.5F, 1.0F, -2.5F}, {-2.5F, 1.0F, -2.5F},
+      {-2.5F, -1.0F, 2.5F}, {2.5F, -1.0F, 2.5F}, {2.5F, 1.0F, 2.5F}, {-2.5F, 1.0F, 2.5F}
+   };
    private final BooleanSetting enderEye = new BooleanSetting(
          this, "modules.settings.itemradius.ender_eye", "modules.settings.itemradius.ender_eye.description"
       )
@@ -163,26 +178,19 @@ public class ItemRadius extends BaseModule {
    };
 
    private boolean isPlayerInRadius(Vec3d center, float radius) {
-      return mc.player != null && mc.world != null
-         ? mc.world
-            .getPlayers()
-            .stream()
-            .anyMatch(
-               player -> {
-                  if (player == mc.player) {
-                     return false;
-                  } else {
-                     Vec3d playerPos = player.getPos();
-                     double distance = Math.sqrt(
-                        Math.pow(playerPos.x - center.x, 2.0)
-                           + Math.pow(playerPos.y - center.y, 2.0)
-                           + Math.pow(playerPos.z - center.z, 2.0)
-                     );
-                     return distance <= radius;
-                  }
-               }
-            )
-         : false;
+      if (mc.player == null || mc.world == null) return false;
+
+      for (PlayerEntity player : mc.world.getPlayers()) {
+         if (player == mc.player) continue;
+         double dx = player.getX() - center.x;
+         double dy = player.getY() - center.y;
+         double dz = player.getZ() - center.z;
+         if (dx * dx + dy * dy + dz * dz <= radius * radius) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private void drawCircle(MatrixStack matrices, Vec3d center, float radius, int color) {
@@ -258,17 +266,8 @@ public class ItemRadius extends BaseModule {
       Tessellator tessellator = Tessellator.getInstance();
       float halfWidth = 2.5F;
       float halfHeight = 2.0F;
-      float[][] vertices = new float[][]{
-         {-halfWidth, -halfHeight, -halfWidth},
-         {halfWidth, -halfHeight, -halfWidth},
-         {halfWidth, halfHeight, -halfWidth},
-         {-halfWidth, halfHeight, -halfWidth},
-         {-halfWidth, -halfHeight, halfWidth},
-         {halfWidth, -halfHeight, halfWidth},
-         {halfWidth, halfHeight, halfWidth},
-         {-halfWidth, halfHeight, halfWidth}
-      };
-      int[][] faces = new int[][]{{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
+      float[][] vertices = TRAP_VERTICES;
+      int[][] faces = FACES;
       int fillColor = color & 16777215 | 1426063360;
       RenderSystem.disableCull();
       BufferBuilder buffer = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
@@ -304,7 +303,7 @@ public class ItemRadius extends BaseModule {
 
       BufferRenderer.drawWithGlobalProgram(buffer.end());
       RenderSystem.enableCull();
-      int[][] edges = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+      int[][] edges = EDGES;
       buffer = tessellator.begin(DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
       for (int[] edge : edges) {
@@ -358,22 +357,13 @@ public class ItemRadius extends BaseModule {
       float halfLength = 2.5F;
       float halfHeight = 2.0F;
       RenderSystem.enableDepthTest();
-      float[][] vertices = new float[][]{
-         {-halfWidth, -halfHeight, -halfLength},
-         {halfWidth, -halfHeight, -halfLength},
-         {halfWidth, halfHeight, -halfLength},
-         {-halfWidth, halfHeight, -halfLength},
-         {-halfWidth, -halfHeight, halfLength},
-         {halfWidth, -halfHeight, halfLength},
-         {halfWidth, halfHeight, halfLength},
-         {-halfWidth, halfHeight, halfLength}
-      };
+      float[][] vertices = PANEL_VERTICES;
       float yaw = mc.player.getYaw(1.0F);
       matrices.push();
       matrices.translate(center.x, center.y, center.z);
       matrices.multiply(new Quaternionf(new AxisAngle4f((float)Math.toRadians(-yaw + 90.0F), 0.0F, 1.0F, 0.0F)));
       matrices.translate(-center.x, -center.y, -center.z);
-      int[][] faces = new int[][]{{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
+      int[][] faces = FACES;
       int fillColor = color & 16777215 | 1426063360;
       RenderSystem.disableCull();
       BufferBuilder buffer = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
@@ -409,7 +399,7 @@ public class ItemRadius extends BaseModule {
 
       BufferRenderer.drawWithGlobalProgram(buffer.end());
       RenderSystem.enableCull();
-      int[][] edges = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+      int[][] edges = EDGES;
       buffer = tessellator.begin(DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
       for (int[] edge : edges) {
@@ -440,17 +430,8 @@ public class ItemRadius extends BaseModule {
       RenderSystem.disableDepthTest();
       float halfSize = 2.5F;
       float halfHeight = 1.0F;
-      float[][] vertices = new float[][]{
-         {-halfSize, -halfHeight, -halfSize},
-         {halfSize, -halfHeight, -halfSize},
-         {halfSize, halfHeight, -halfSize},
-         {-halfSize, halfHeight, -halfSize},
-         {-halfSize, -halfHeight, halfSize},
-         {halfSize, -halfHeight, halfSize},
-         {halfSize, halfHeight, halfSize},
-         {-halfSize, halfHeight, halfSize}
-      };
-      int[][] faces = new int[][]{{0, 1, 2, 3}, {4, 7, 6, 5}, {0, 4, 5, 1}, {2, 6, 7, 3}, {0, 3, 7, 4}, {1, 5, 6, 2}};
+      float[][] vertices = FLOOR_VERTICES;
+      int[][] faces = FACES;
       int fillColor = color & 16777215 | 1426063360;
       RenderSystem.disableCull();
       BufferBuilder buffer = tessellator.begin(DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR);
@@ -486,7 +467,7 @@ public class ItemRadius extends BaseModule {
 
       BufferRenderer.drawWithGlobalProgram(buffer.end());
       RenderSystem.enableCull();
-      int[][] edges = new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {4, 5}, {5, 6}, {6, 7}, {7, 4}, {0, 4}, {1, 5}, {2, 6}, {3, 7}};
+      int[][] edges = EDGES;
       buffer = tessellator.begin(DrawMode.DEBUG_LINES, VertexFormats.POSITION_COLOR);
 
       for (int[] edge : edges) {

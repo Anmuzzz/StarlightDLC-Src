@@ -47,7 +47,21 @@ public class CustomDrawContext extends DrawContext implements IMinecraft {
       return new CustomDrawContext(originalContext);
    }
 
+
+   private void beginFontBatch(Font font) {
+      if (!com.isusdlc.utility.render.batching.Batching.AUTO) return;
+      var active = com.isusdlc.utility.render.batching.Batching.getActive();
+      if (active instanceof com.isusdlc.utility.render.batching.impl.FontBatching) return;
+      com.isusdlc.utility.render.batching.Batching.flushActive();
+      new com.isusdlc.utility.render.batching.impl.FontBatching(net.minecraft.client.render.VertexFormats.POSITION_TEXTURE_COLOR, font.getFont());
+   }
+
+   private void flushHudBatch() {
+      com.isusdlc.utility.render.batching.Batching.flushActive();
+   }
+
    public void drawClientRect(float x, float y, float width, float height, float alpha, float dragAnim, float squircle) {
+      this.flushHudBatch();
       if (Interface.showMinimalizm()) {
          this.drawBlurredRect(x, y, width, height, 11.25F, squircle, BorderRadius.all(8.0F), ColorRGBA.WHITE.withAlpha(255.0F * alpha * Interface.minimalizm()));
       }
@@ -82,30 +96,37 @@ public class CustomDrawContext extends DrawContext implements IMinecraft {
    }
 
    public void drawRect(float x, float y, float width, float height, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawRect(this.getMatrices(), x, y, width, height, color);
    }
 
    public void drawLine(Vec2f from, Vec2f to, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawLine(this.getMatrices(), from, to, color);
    }
 
    public void drawBezier(Vec2f p0, Vec2f p1, Vec2f p2, Vec2f p3, ColorRGBA color, int resolution) {
+      this.flushHudBatch();
       DrawUtility.drawBezier(this.getMatrices(), p0, p1, p2, p3, color, resolution);
    }
 
    public void drawSquircle(float x, float y, float width, float height, float squirt, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawSquircle(this.getMatrices(), x, y, width, height, squirt, borderRadius, color);
    }
 
    public void drawRoundedRect(float x, float y, float width, float height, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawRoundedRect(this.getMatrices(), x, y, width, height, borderRadius, color);
    }
 
    public void drawRoundedRect(float x, float y, float width, float height, BorderRadius borderRadius, Gradient gradient) {
+      this.flushHudBatch();
       DrawUtility.drawRoundedRect(this.getMatrices(), x, y, width, height, borderRadius, gradient);
    }
 
    public void drawLiquidGlass(float x, float y, float width, float height, float squirt, float power, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       borderRadius = new BorderRadius(
          borderRadius.topLeftRadius() * squirt / 2.0F,
          borderRadius.topRightRadius() * squirt / 2.0F,
@@ -133,6 +154,7 @@ public class CustomDrawContext extends DrawContext implements IMinecraft {
    }
 
    public void drawLiquidGlass(float x, float y, float width, float height, float squirt, BorderRadius borderRadius, ColorRGBA color, boolean clean) {
+      this.flushHudBatch();
       borderRadius = new BorderRadius(
          borderRadius.topLeftRadius() * squirt / 2.0F,
          borderRadius.topRightRadius() * squirt / 2.0F,
@@ -160,72 +182,89 @@ public class CustomDrawContext extends DrawContext implements IMinecraft {
    }
 
    public void drawLoadingRect(float x, float y, float width, float height, float progress, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawLoadingRect(this.getMatrices(), x, y, width, height, progress, borderRadius, color);
    }
 
    public void drawRoundedBorder(float x, float y, float width, float height, float borderThickness, BorderRadius borderRadius, ColorRGBA borderColor) {
+      this.flushHudBatch();
       DrawUtility.drawRoundedBorder(this.getMatrices(), x, y, width, height, borderThickness, borderRadius, borderColor);
    }
 
    public void drawTexture(Identifier identifier, Rect rect) {
+      this.flushHudBatch();
       this.drawTexture(identifier, rect, ColorRGBA.WHITE);
    }
 
    public void drawTexture(Identifier identifier, Rect rect, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawTexture(this.getMatrices(), identifier, rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(), color);
    }
 
    public void drawTexture(Identifier identifier, float x, float y, float width, float height) {
+      this.flushHudBatch();
       DrawUtility.drawTexture(this.getMatrices(), identifier, x, y, width, height, ColorRGBA.WHITE);
    }
 
    public void drawTexture(Identifier identifier, float x, float y, float width, float height, float u1, float u2, float v1, float v2, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawTexture(this.getMatrices(), identifier, x, y, width, height, u1, u2, v1, v2, color);
    }
 
    public void drawTexture(Identifier identifier, float x, float y, float width, float height, ColorRGBA textureColor) {
+      this.flushHudBatch();
       DrawUtility.drawTexture(this.getMatrices(), identifier, x, y, width, height, textureColor);
    }
 
    public void drawSprite(CustomSprite sprite, float x, float y, float width, float height, ColorRGBA textureColor) {
+      this.flushHudBatch();
       DrawUtility.drawSprite(this.getMatrices(), sprite, x, y, width, height, textureColor);
    }
 
    public void drawRoundedTexture(Identifier identifier, float x, float y, float width, float height, BorderRadius borderRadius) {
+      this.flushHudBatch();
       DrawUtility.drawRoundedTexture(this.getMatrices(), identifier, x, y, width, height, borderRadius);
    }
 
    public void drawRoundedTexture(Identifier identifier, float x, float y, float width, float height, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawRoundedTexture(this.getMatrices(), identifier, x, y, width, height, borderRadius, color);
    }
 
    public void drawShadow(float x, float y, float width, float height, float softness, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawShadow(this.getMatrices(), x, y, width, height, softness, borderRadius, color);
    }
 
    public void drawBlurredRect(float x, float y, float width, float height, float blurRadius, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawBlur(this.getMatrices(), x, y, width, height, blurRadius, borderRadius, color);
    }
 
    public void drawBlurredRect(float x, float y, float width, float height, float blurRadius, float squirt, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawBlur(this.getMatrices(), x, y, width, height, blurRadius, squirt, borderRadius, color);
    }
 
    public void drawText(Font font, String text, float x, float y, ColorRGBA color) {
+      this.beginFontBatch(font);
       MsdfRenderer.renderText(font.getFont(), text, font.getSize(), color.getRGB(), this.getMatrices().peek().getPositionMatrix(), x, y, 0.0F);
    }
 
    public void drawText(Font font, Text text, float x, float y) {
+      this.beginFontBatch(font);
       MsdfRenderer.renderText(font.getFont(), text, font.getSize(), this.getMatrices().peek().getPositionMatrix(), x, y, 0.0F);
    }
 
    public void drawFadeoutText(Font font, String text, float x, float y, ColorRGBA color, float fadeoutStart, float fadeoutEnd) {
+      this.beginFontBatch(font);
       MsdfRenderer.renderText(
          font.getFont(), text, font.getSize(), color.getRGB(), this.getMatrices().peek().getPositionMatrix(), x, y, 0.0F, true, fadeoutStart, fadeoutEnd
       );
    }
 
    public void drawFadeoutText(Font font, String text, float x, float y, ColorRGBA color, float fadeoutStart, float fadeoutEnd, float maxWidth) {
+      this.beginFontBatch(font);
       MsdfRenderer.renderText(
          font.getFont(),
          text,
@@ -243,18 +282,22 @@ public class CustomDrawContext extends DrawContext implements IMinecraft {
    }
 
    public void drawCenteredText(Font font, String text, float x, float y, ColorRGBA color) {
+      this.beginFontBatch(font);
       this.drawText(font, text, x - font.getFont().getWidth(text, font.getSize()) / 2.0F, y, color);
    }
 
    public void drawRightText(Font font, String text, float x, float y, ColorRGBA color) {
+      this.beginFontBatch(font);
       this.drawText(font, text, x - font.getFont().getWidth(text, font.getSize()), y, color);
    }
 
    public void drawItem(Item item, float x, float y, float size) {
+      this.flushHudBatch();
       this.drawItem(item.getDefaultStack(), x, y, size);
    }
 
    public void drawItem(ItemStack item, float x, float y, float size) {
+      this.flushHudBatch();
       this.getMatrices().push();
       this.getMatrices().translate(x, y, 0.0F);
       this.getMatrices().scale(size, size, size);
@@ -265,14 +308,17 @@ public class CustomDrawContext extends DrawContext implements IMinecraft {
    }
 
    public void drawHead(AbstractClientPlayerEntity player, float x, float y, float size, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawPlayerHeadWithHat(this.getMatrices(), player, x, y, size, borderRadius, color);
    }
 
    public void drawHead(LivingEntity entity, float x, float y, float size, BorderRadius borderRadius, ColorRGBA color) {
+      this.flushHudBatch();
       DrawUtility.drawEntityHeadWithHat(this.getMatrices(), entity, x, y, size, borderRadius, color);
    }
 
    public void drawBatchItem(ItemStack item, int x, int y) {
+      this.flushHudBatch();
       this.drawBatchItem(mc.player, mc.world, item, x, y, 0);
    }
 

@@ -114,6 +114,10 @@ public final class MsdfRenderer {
       float fadeoutEnd,
       float maxWidth
    ) {
+      if (Batching.AUTO && Batching.getActive() != null) {
+         Batching.flushActive();  // эта перегрузка всегда рисует напрямую — сбрасываем накопленный текст
+      }
+
       float thickness = 0.05F;
       float smoothness = 0.5F;
       float spacing = 0.0F;

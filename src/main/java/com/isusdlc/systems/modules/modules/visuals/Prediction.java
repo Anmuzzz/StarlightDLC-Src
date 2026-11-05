@@ -363,7 +363,7 @@ public class Prediction extends BaseModule {
             int ticks = 0;
             BlockHitResult blockHitResult = null;
 
-            for (int i = 0; i < 150; i++) {
+            for (int i = 0; i < 60; i++) {  // 3 c — хватает для посадки снаряда, экономит до 90 raycast'ов на снаряд
                Vec3d motion = this.predictMotion(entity, lastMotion);
                Vec3d pos = lastPos.add(motion);
                ticks = i;

@@ -1473,7 +1473,9 @@
         const releases = await res.json();
         const release = releases.find(r => !r.draft && (r.assets || []).some(a => a.name.endsWith('.jar') && !a.name.includes('sources')));
         if (!release) throw new Error('no published release with a jar');
-        const jar = release.assets.find(a => a.name.endsWith('.jar') && !a.name.includes('sources'));
+        // предпочитаем полный билд, -no-youtube — запасной вариант
+        const jars = release.assets.filter(a => a.name.endsWith('.jar') && !a.name.includes('sources'));
+        const jar = jars.find(a => !a.name.includes('no-youtube')) || jars[0];
 
         releaseJarUrl = jar.browser_download_url;
         document.querySelectorAll('[data-release-version]').forEach(el => {

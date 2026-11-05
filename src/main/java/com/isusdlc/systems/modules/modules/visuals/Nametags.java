@@ -37,6 +37,8 @@ public class Nametags extends BaseModule {
       .color(new ColorRGBA(255.0F, 255.0F, 255.0F, 255.0F));
    private final SliderSetting scale = new SliderSetting(this, "Scale")
       .min(0.5F).max(3.0F).step(0.1F).currentValue(1.0F);
+   private final SliderSetting distance = new SliderSetting(this, "Distance")
+      .min(8.0F).max(64.0F).step(1.0F).currentValue(64.0F);
 
    private final EventListener<PreHudRenderEvent> onRender2D = event -> {
       if (mc.world == null || mc.player == null) return;
@@ -51,6 +53,7 @@ public class Nametags extends BaseModule {
          if (entity != mc.player && !isValidTarget(living)) continue;
          if (living.isInvisible()) continue;
          if (!living.isAlive()) continue;
+         if (mc.player.distanceTo(living) > this.distance.getCurrentValue()) continue;
 
          Vec3d pos = new Vec3d(
             MathHelper.lerp(mc.getRenderTickCounter().getTickDelta(false), living.prevX, living.getX()),

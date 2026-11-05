@@ -4,7 +4,7 @@ plugins {
     id "io.freefair.lombok" version "8.11"
 }
 
-version = project.mod_version
+version = project.mod_version + (project.hasProperty('noYoutube') ? '-no-youtube' : '')
 group = project.maven_group
 
 base {
@@ -34,12 +34,15 @@ dependencies {
     implementation "org.luaj:luaj-jse:3.0.1"
     include "org.luaj:luaj-jse:3.0.1"
 
-    // JavaFX для встроенного YouTube-плеера (WebView + медиа): Windows + Linux
-    def jfxVersion = '21.0.5'
-    ['win', 'linux'].each { platform ->
-        ['base', 'graphics', 'media', 'web', 'swing'].each { module ->
-            implementation "org.openjfx:javafx-$module:$jfxVersion:$platform"
-            include "org.openjfx:javafx-$module:$jfxVersion:$platform"
+    // JavaFX для встроенного YouTube-плеера (WebView + медиа): Windows + Linux.
+    // Лёгкий билд без плеера: ./gradlew build -PnoYoutube
+    if (!project.hasProperty('noYoutube')) {
+        def jfxVersion = '21.0.5'
+        ['win', 'linux'].each { platform ->
+            ['base', 'graphics', 'media', 'web', 'swing'].each { module ->
+                implementation "org.openjfx:javafx-$module:$jfxVersion:$platform"
+                include "org.openjfx:javafx-$module:$jfxVersion:$platform"
+            }
         }
     }
 
