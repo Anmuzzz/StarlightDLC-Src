@@ -29,6 +29,7 @@
       scroll-behavior: smooth;
       scrollbar-width: thin;
       scrollbar-color: var(--primary) var(--bg);
+      overflow-x: clip;
     }
 
     body {
@@ -635,6 +636,7 @@
       transition: transform 0.2s, box-shadow 0.3s;
       position: relative; z-index: 1;
     }
+    .btn-download.secondary { background: transparent; border: 1px solid var(--border); padding: 13px 32px; font-size: 0.85rem; }
     .btn-download:hover { transform: translateY(-3px); box-shadow: var(--glow-gold); }
     .btn-download:active { transform: translateY(0); }
     .btn-download:disabled { opacity: 0.6; cursor: wait; transform: none; }
@@ -1090,8 +1092,16 @@
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Без потери FPS</span>
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Приватные bypass</span>
         <span data-release-size>23 МБ</span>
+        <span data-release-lite-size>23 МБ</span>
       </div>
-      <button class="btn-download cursor-hover" id="btnDownload" onclick="handleFreeDownload()">
+      <button class="btn-download cursor-hover" id="btnDownload" onclick="handleFreeDownload(false)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="btnDownloadText">Скачать бесплатно</span>
+      </button>
+      <button class="btn-download secondary cursor-hover" id="btnDownloadLite" onclick="handleFreeDownload(true)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="btnDownloadLiteText">Без YouTube — лёгкая</span>
+      </button>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span id="btnDownloadText">Скачать бесплатно</span>
       </button>
@@ -1440,7 +1450,7 @@
 
       // Stagger cards - use batch for perf, handle both fade+slide
       ScrollTrigger.batch('.feature-card, .module-card', {
-        onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out', overwrite: true }),
+        onEnter: batch => gsap.to(batch, { opacity: 1, x: 0, y: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out', overwrite: true }),
         start: 'top 90%'
       });
       // Ensure cards start hidden for batch
@@ -1458,6 +1468,7 @@
     const REPO = 'Anmuzzz/StarlightDLC-Src';
     const DOWNLOAD_URL = 'starlightdlc.jar'; // фолбэк, если API релизов недоступен
     let releaseJarUrl = null;
+    let liteJarUrl = null;
 
     function formatReleaseVersion(tag) {
       return tag.replace(/^v/, '');
@@ -1476,8 +1487,15 @@
         // предпочитаем полный билд, -no-youtube — запасной вариант
         const jars = release.assets.filter(a => a.name.endsWith('.jar') && !a.name.includes('sources'));
         const jar = jars.find(a => !a.name.includes('no-youtube')) || jars[0];
+        const liteJar = jars.find(a => a.name.includes('no-youtube'));
 
         releaseJarUrl = jar.browser_download_url;
+        liteJarUrl = liteJar ? liteJar.browser_download_url : null;
+        if (liteJar) {
+          document.querySelectorAll('[data-release-lite-size]').forEach(el => {
+            el.textContent = (liteJar.size / 1048576).toFixed(1) + ' MB';
+          });
+        }
         document.querySelectorAll('[data-release-version]').forEach(el => {
           el.textContent = formatReleaseVersion(release.tag_name);
         });
@@ -1489,10 +1507,10 @@
       }
     }
 
-    function handleFreeDownload() {
-      const btn = document.getElementById('btnDownload');
-      const txt = document.getElementById('btnDownloadText');
-      const url = releaseJarUrl || DOWNLOAD_URL;
+    function handleFreeDownload(lite) {
+      const btn = document.getElementById(lite ? 'btnDownloadLite' : 'btnDownload');
+      const txt = document.getElementById(lite ? 'btnDownloadLiteText' : 'btnDownloadText');
+      const url = lite ? (liteJarUrl || releaseJarUrl || DOWNLOAD_URL) : (releaseJarUrl || DOWNLOAD_URL);
       if (btn) { btn.disabled = true; if (txt) txt.textContent = 'Загрузка...'; }
       const a = document.createElement('a');
       a.href = url;
@@ -1505,7 +1523,7 @@
       // fallback: открыть в новой вкладке если браузер блокирует download
       setTimeout(() => {
         window.open(url, '_blank', 'noopener');
-        if (btn) { btn.disabled = false; if (txt) txt.textContent = 'Скачать бесплатно'; }
+        if (btn) { btn.disabled = false; if (txt) txt.textContent = lite ? 'Без YouTube — лёгкая' : 'Скачать бесплатно'; }
       }, 500);
     }
 
