@@ -101,6 +101,9 @@ public class PVPAI extends BaseModule implements IMinecraft, IScaledResolution {
             }
          }
 
+         // не копим PlayerEntity всех, кто когда-либо попадал в радиус
+         this.playerWinChances.keySet().removeIf(p -> p.isRemoved() || !mc.world.getPlayers().contains(p));
+
          if (visibleEnemies > 0) {
             this.ourWinChance = this.calculateWinChance(ourPower, totalEnemyPower / visibleEnemies);
          } else {

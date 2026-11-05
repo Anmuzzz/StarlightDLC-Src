@@ -196,6 +196,7 @@ public class YouTubeScreen extends CustomScreen implements IMinecraft {
 
         HTTP.sendAsync(request, HttpResponse.BodyHandlers.ofByteArray())
             .thenAccept(response -> mc.execute(() -> {
+                if (mc.currentScreen != this) return;  // экран закрыт — не регистрируем текстуру в никуда
                 if (this.thumbnails.containsKey(videoId)) return;
                 try {
                     NativeImage image = NativeImage.read(response.body());

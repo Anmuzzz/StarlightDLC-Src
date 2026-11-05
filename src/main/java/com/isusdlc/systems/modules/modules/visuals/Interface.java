@@ -69,7 +69,7 @@ public class Interface extends BaseModule {
       .max(0.2F)
       .step(0.01F)
       .currentValue(0.08F);
-   private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
+   private ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
       Thread t = new Thread(r, "Interface-Thread");
       t.setDaemon(true);
       return t;
@@ -297,6 +297,14 @@ public class Interface extends BaseModule {
 
    @Override
    public void onEnable() {
+      if (this.executor == null || this.executor.isShutdown()) {
+         this.executor = Executors.newSingleThreadExecutor(r -> {
+            Thread thread = new Thread(r, "Starlight-Interface");
+            thread.setDaemon(true);
+            return thread;
+         });
+      }
+
       super.onEnable();
    }
 

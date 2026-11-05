@@ -50,6 +50,7 @@ public class HitFX extends BaseModule {
 
    private final List<Fx> active = new ArrayList<>();
    private final Random random = new Random();
+   private final Random effectRandom = new Random();
 
    private static final class Fx {
       final LivingEntity target;
@@ -156,7 +157,8 @@ public class HitFX extends BaseModule {
 
    /** Радиальные искры из точки удара. */
    private void drawSparks(MatrixStack ms, Vec3d relPos, float originY, float progress, float alpha, long seed, float sizeMul, int cr, int cg, int cb) {
-      Random rng = new Random(seed);
+      Random rng = this.effectRandom;
+      rng.setSeed(seed);
       int count = 8;
       float length = (1.1F - 0.9F * progress) * sizeMul;
       int sparkAlpha = (int) (alpha * 220.0F);
@@ -183,7 +185,8 @@ public class HitFX extends BaseModule {
 
    /** Разлетающиеся светящиеся частицы (bloom-билборды). */
    private void drawBurst(MatrixStack ms, Camera camera, Vec3d relPos, float originY, float progress, float alpha, long seed, float sizeMul, int cr, int cg, int cb) {
-      Random rng = new Random(seed);
+      Random rng = this.effectRandom;
+      rng.setSeed(seed);
       int count = 10;
       float spread = (0.3F + 1.6F * this.easeOut(progress)) * sizeMul;
       int dotAlpha = (int) ((float) (alpha * alpha) * 230.0F);

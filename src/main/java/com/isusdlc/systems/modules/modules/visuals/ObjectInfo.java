@@ -95,20 +95,18 @@ public class ObjectInfo extends BaseModule {
       }
    };
    private final EventListener<Render3DEvent> onRender3D = event -> {
-      BlockPos toRemove = null;
+      this.infos.entrySet().removeIf(entry -> entry.getValue().start.finished(entry.getValue().getType().getTime()));
 
       for (Entry<BlockPos, ObjectInfo.Info> entry : this.infos.entrySet()) {
-         ObjectInfo.Info info = entry.getValue();
-         info.draw3D(event);
-         if (info.start.finished(info.getType().getTime())) {
-            toRemove = entry.getKey();
-         }
-      }
-
-      if (toRemove != null) {
-         this.infos.remove(toRemove);
+         entry.getValue().draw3D(event);
       }
    };
+
+   @Override
+   public void onDisable() {
+      this.infos.clear();
+      super.onDisable();
+   }
 
    static class Info {
       final BlockPos pos;

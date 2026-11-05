@@ -132,6 +132,10 @@ public final class MsdfFont {
          return cached.width;
       }
 
+      if (this.widthCache.size() > 10_000) {
+         this.widthCache.clear();
+      }
+
       float w = this.getWidthOld(text, size);
       this.widthCache.put(key, new CachedWidth(text, w));
       return w;

@@ -34,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin({ClientPlayNetworkHandler.class})
 public abstract class ClientPlayNetworkHandlerMixin extends ClientCommonNetworkHandler implements IMinecraft {
+   private final com.isusdlc.utility.time.Timer sweepTimer = new com.isusdlc.utility.time.Timer();
    @Unique
    private Rotation oldRotation = Rotation.ZERO;
 
@@ -63,9 +64,16 @@ public abstract class ClientPlayNetworkHandlerMixin extends ClientCommonNetworkH
    )
    private void onBlockEntityUpdate(BlockEntityUpdateS2CPacket packet, CallbackInfo ci) {
       if (mc.world != null) {
+         // выгруженные чанки помечают свои BlockEntity как removed — выметаем их раз в 5с,
+         // иначе список растёт всю сессию (утечка содержимого сундуков)
+         if (sweepTimer.finished(5000L)) {
+            sweepTimer.reset();
+            WorldUtility.blockEntities.removeIf(BlockEntity::isRemoved);
+         }
+
          BlockPos pos = packet.getPos();
          BlockEntity blockEntity = mc.world.getBlockEntity(pos);
-         if (blockEntity != null && !WorldUtility.blockEntities.contains(blockEntity)) {
+         if (blockEntity != null && !blockEntity.isRemoved() && !WorldUtility.blockEntities.contains(blockEntity)) {
             WorldUtility.blockEntities.add(blockEntity);
          }
       }
