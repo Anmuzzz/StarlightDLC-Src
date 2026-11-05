@@ -67,6 +67,14 @@ public class MusicTracker implements IMinecraft {
    public Identifier getImage() {
       try {
          if (this.textureCache.size() > 10) {
+            // старые текстуры надо уничтожить в GL, а не просто забыть идентификаторы
+            for (Identifier id : this.textureCache.values()) {
+               try {
+                  mc.getTextureManager().destroyTexture(id);
+               } catch (Exception ignored) {
+               }
+            }
+
             this.textureCache.clear();
             this.colorCache.clear();
          }

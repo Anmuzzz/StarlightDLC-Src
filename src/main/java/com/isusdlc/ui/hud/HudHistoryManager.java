@@ -6,8 +6,13 @@ public class HudHistoryManager {
    private final Stack<MoveAction> undoStack = new Stack<>();
    private final Stack<MoveAction> redoStack = new Stack<>();
 
+   private static final int MAX_HISTORY = 50;
+
    public void registerMove(HudElement element, float fromX, float fromY, float toX, float toY) {
       this.undoStack.push(new MoveAction(element, fromX, fromY, toX, toY));
+      while (this.undoStack.size() > MAX_HISTORY) {
+         this.undoStack.remove(0);
+      }
       this.redoStack.clear();
    }
 
