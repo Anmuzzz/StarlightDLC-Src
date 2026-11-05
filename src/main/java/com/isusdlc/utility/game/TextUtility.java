@@ -640,8 +640,18 @@ public final class TextUtility implements IMinecraft {
       }
    }
 
+   private static String cachedTime = "";
+   private static long cachedTimeAt;
+
    public static String getCurrentTime() {
-      return sdf.format(new Date());
+      // вызывается каждый кадр из HUD: формат даты меняется раз в секунду
+      long now = System.currentTimeMillis();
+      if (now - cachedTimeAt > 1000L) {
+         cachedTime = sdf.format(new Date());
+         cachedTimeAt = now;
+      }
+
+      return cachedTime;
    }
 
    public static String getFormattedDate() {

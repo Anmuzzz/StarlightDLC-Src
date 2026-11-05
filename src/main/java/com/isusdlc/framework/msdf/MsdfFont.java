@@ -21,7 +21,18 @@ public final class MsdfFont {
    private final FontData.MetricsData metrics;
    private final Map<Integer, MsdfGlyph> glyphs;
    private final Map<Integer, Map<Integer, Float>> kernings;
-   private final ConcurrentHashMap<Long, Float> widthCache = new ConcurrentHashMap<>();
+   private final ConcurrentHashMap<Long, CachedWidth> widthCache = new ConcurrentHashMap<>();
+
+   /** Хранит текст вместе с шириной: разные строки с одинаковым hashCode не должны делить запись. */
+   private static final class CachedWidth {
+      final String text;
+      final float width;
+
+      CachedWidth(String text, float width) {
+         this.text = text;
+         this.width = width;
+      }
+   }
    private final ConcurrentHashMap<Float, Font> fontCache = new ConcurrentHashMap<>();
 
    private MsdfFont(
@@ -116,14 +127,14 @@ public final class MsdfFont {
       }
 
       long key = widthKey(text, size, np);
-      Float cached = this.widthCache.get(key);
-      if (cached != null) {
-         return cached;
-      } else {
-         float w = this.getWidthOld(text, size);
-         this.widthCache.put(key, w);
-         return w;
+      CachedWidth cached = this.widthCache.get(key);
+      if (cached != null && cached.text.equals(text)) {
+         return cached.width;
       }
+
+      float w = this.getWidthOld(text, size);
+      this.widthCache.put(key, new CachedWidth(text, w));
+      return w;
    }
 
    public void clearWidthCache() {

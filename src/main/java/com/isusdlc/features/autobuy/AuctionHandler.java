@@ -284,7 +284,7 @@ public class AuctionHandler {
                }
 
                if (var11 > 0) {
-                  boolean var12 = var10.equals(var4) || var10.contains(var4) || var4.contains(var10);
+                  boolean var12 = var10.equals(var4) || var10.contains(var4) || !var10.isEmpty() && var4.contains(var10);
                   boolean var13 = var11 == var3;
                   if (var12 && var13) {
                      return var6;
@@ -306,7 +306,7 @@ public class AuctionHandler {
             if (var6 != null && var6.isEnabled()) {
                String var7 = var6.getDisplayName() != null ? var6.getDisplayName().replaceAll("§[0-9a-fk-or]", "").trim().toLowerCase() : "";
                String var8 = var6.getSearchName() != null ? var6.getSearchName().replaceAll("§[0-9a-fk-or]", "").trim().toLowerCase() : "";
-               if (var7.equals(var3) || var8.equals(var3) || var3.contains(var7) || var7.contains(var3) || var3.contains(var8) || var8.contains(var3)) {
+               if (var7.equals(var3) || var8.equals(var3) || !var7.isEmpty() && var3.contains(var7) || !var7.isEmpty() && var7.contains(var3) || !var8.isEmpty() && var3.contains(var8) || !var8.isEmpty() && var8.contains(var3)) {
                   return var6;
                }
             }

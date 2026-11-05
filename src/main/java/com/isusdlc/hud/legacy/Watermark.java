@@ -199,7 +199,7 @@ public class Watermark extends AbstractHudElement {
                     if (alpha > 0) Fonts.BOLD.draw(String.valueOf(newChar), offsetX, y + newOffsetY, size, new Color(255, 255, 255, alpha).getRGB());
                 }
             }
-            if (newChar != ' ') offsetX += charWidth;
+            offsetX += charWidth;
         }
     }
 

@@ -137,6 +137,7 @@ import ru.kotopushka.compiler.sdk.annotations.CompileBytecode;
 public class ModuleManager {
    private final List<Module> modules = new ArrayList<>();
    private final java.util.Map<Class<?>, Module> moduleClassCache = new java.util.concurrent.ConcurrentHashMap<>();
+   private final java.util.Map<String, Module> moduleNameCache = new java.util.concurrent.ConcurrentHashMap<>();
    private final EventListener<ClientPlayerTickEvent> tickListener;
    private final EventListener<HudRenderEvent> moduleWidgetRenderer;
    private final EventListener<KeyPressEvent> onKeyPress = event -> {
@@ -300,14 +301,19 @@ public class ModuleManager {
    public void register(BaseModule module) {
       this.modules.add(module);
       this.moduleClassCache.put(module.getClass(), module);
+      String name = module.getName();
+      // findFirst в старом стриме возвращал первый совпавший — putIfAbsent сохраняет семантику
+      this.moduleNameCache.putIfAbsent(name.toLowerCase(), module);
+      this.moduleNameCache.putIfAbsent(name.replace(" ", "").toLowerCase(), module);
    }
 
    public <T extends Module> T getModule(String name) {
-      return (T)this.modules
-         .stream()
-         .filter(module -> module.getName().replace(" ", "").equalsIgnoreCase(name) || module.getName().equalsIgnoreCase(name))
-         .findFirst()
-         .orElseThrow(() -> new UnknownModuleException(name));
+      Module module = this.moduleNameCache.get(name.toLowerCase());
+      if (module == null) {
+         throw new UnknownModuleException(name);
+      }
+
+      return (T)module;
    }
 
    public <T extends Module> T getModule(Class<T> clazz) {

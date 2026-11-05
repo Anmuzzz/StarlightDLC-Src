@@ -166,12 +166,15 @@ public class Effects extends HudList {
                Font timeFont = Fonts.MEDIUM.getFont(6.5F);
                float timeHeight = 13.0F;
                String timeText;
+               String minutesAndSeparator = null;
+               int seconds = -1;
                float timeWidth;
                if (!effxx.isInfinite() && effxx.getDuration() < 999999999) {
                   int totalSeconds = effxx.getDuration() / 20;
                   int minutes = totalSeconds / 60;
-                  int seconds = totalSeconds % 60;
+                  seconds = totalSeconds % 60;
                   timeText = String.format("%02d:%02d", minutes, seconds);
+                  minutesAndSeparator = String.format("%02d:", minutes);
                   timeWidth = timeFont.width(timeText) + 10.0F;
                } else {
                   timeText = "**:**";
@@ -182,11 +185,7 @@ public class Effects extends HudList {
                float timeY = this.y + offset + off + (itemHeight - timeHeight) / 2.0F;
                context.drawRoundedRect(timeX, timeY, timeWidth, timeHeight, BorderRadius.all(4.0F), Colors.getTextColor().withAlpha(10.0F * anim.getValue()));
                if (!effxx.isInfinite() && effxx.getDuration() < 999999999) {
-                  int totalSeconds = effxx.getDuration() / 20;
-                  int minutes = totalSeconds / 60;
-                  int seconds = totalSeconds % 60;
-                  String timeStr = String.format("%02d:%02d", minutes, seconds);
-                  String minutesAndSeparator = String.format("%02d:", minutes);
+                  String timeStr = timeText;
                   float minutesWidth = timeFont.width(minutesAndSeparator);
                   float totalWidth = timeFont.width(timeStr);
                   float timeStartX = timeX + (timeWidth - totalWidth) / 2.0F + 1.0F;

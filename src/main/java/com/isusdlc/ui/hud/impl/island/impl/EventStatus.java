@@ -18,6 +18,9 @@ import com.isusdlc.utility.time.Timer;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 
 public class EventStatus extends TimerStatus {
+   private static final Pattern EVENT_NAME = Pattern.compile("\\[([^\\]]+)\\]");
+   private static final Pattern EVENT_COORDS = Pattern.compile("координатах\\s+(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)");
+   private static final Pattern DEATH_COORDS = Pattern.compile("координаты:?\\s*(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)", Pattern.CASE_INSENSITIVE);
    private final List<ActiveEvent> activeEvents = new ArrayList<>();
    private final Timer timer = new Timer();
    private String pendingEvent;
@@ -26,8 +29,8 @@ public class EventStatus extends TimerStatus {
       if (event.getPacket() instanceof GameMessageS2CPacket packet) {
          String message = packet.content().getString().replaceAll("\\n", " ").replaceAll("[^\\p{L}\\p{N}\\s\\[\\]:.-]", "").replaceAll("\\s{2,}", " ").trim();
          if (packet.content().getString().contains("Появился")) {
-            Matcher eventMatcher = Pattern.compile("\\[([^\\]]+)\\]").matcher(message);
-            Matcher coordMatcher = Pattern.compile("координатах\\s+(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)").matcher(message);
+            Matcher eventMatcher = EVENT_NAME.matcher(message);
+            Matcher coordMatcher = EVENT_COORDS.matcher(message);
             if (eventMatcher.find() && coordMatcher.find()) {
                String eventName = eventMatcher.group(1);
 
@@ -60,7 +63,7 @@ public class EventStatus extends TimerStatus {
             }
 
             if (message.toLowerCase().startsWith("координаты")) {
-               Matcher coordMatcher = Pattern.compile("координаты:?\\s*(-?\\d+)\\s+(-?\\d+)\\s+(-?\\d+)", 2).matcher(message);
+               Matcher coordMatcher = DEATH_COORDS.matcher(message);
                if (coordMatcher.find() && this.pendingEvent != null) {
                   for (EventType valuexx : EventType.values()) {
                      if (this.pendingEvent.equalsIgnoreCase(valuexx.getName())) {

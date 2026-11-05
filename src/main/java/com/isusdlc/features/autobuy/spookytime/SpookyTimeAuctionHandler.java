@@ -67,7 +67,7 @@ public class SpookyTimeAuctionHandler {
                this.buyTimer.resetCounter();
             }
 
-            if (this.refreshTimer.hasTimeElapsed(150L)) {
+            if (this.refreshTimer.hasTimeElapsed(var4 > 0L ? var4 : 150L)) {
                this.refreshAuction(var1, var2);
                this.refreshTimer.resetCounter();
                this.refreshCooldown.resetCounter();

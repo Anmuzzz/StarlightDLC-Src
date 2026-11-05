@@ -1,7 +1,6 @@
 package com.isusdlc.systems.modules.modules.combat;
 
 import com.isusdlc.elegant;
-import com.isusdlc.hud.legacy.StopWatch;
 import com.isusdlc.systems.event.EventListener;
 import com.isusdlc.systems.event.impl.player.ClientPlayerTickEvent;
 import com.isusdlc.systems.modules.api.ModuleCategory;
@@ -101,13 +100,13 @@ public class KillAura extends BaseModule {
    };
    private int clickIndex;
    private boolean alternateTickDelay;
-   private long lastClickTime = System.currentTimeMillis();
-   private final StopWatch attackWatch = new StopWatch();
+   private long lastClickTime;
    private final Random random = new Random();
     public LivingEntity target;
     private Vec3d currentAimPoint;
-    private int airTicks;
+    private boolean targetBlocked;
     private boolean wasSprinting;
+    private boolean shieldDisengaged;
     private boolean stopSprintPacketSent;
 
     public final NeuroAuraSystem neuroSystem = new NeuroAuraSystem();
@@ -130,10 +129,9 @@ public class KillAura extends BaseModule {
     private final EventListener<ClientPlayerTickEvent> onTick = event -> {
        if (mc.world == null || mc.player == null) return;
 
-       airTicks++;
-       if (mc.player.isOnGround()) airTicks = 0;
 
        target = findTarget();
+       this.targetBlocked = target != null && !raytraceToEntity(target);
         if (target == null) {
            currentAimPoint = null;
            releaseSprint();
@@ -191,6 +189,18 @@ public class KillAura extends BaseModule {
       if (mc.world == null || mc.player == null) return null;
 
       float maxDist = maxDistanceSetting.getCurrentValue();
+      Vec3d eyePosEarly = mc.player.getEyePos();
+
+      // гистерезис: держим текущую цель, пока она валидна и в радиусе ×1.1 (без фликера между равными)
+      LivingEntity current = this.target;
+      if (current != null
+         && current.isAlive()
+         && current.getHealth() > 0.0F
+         && getDistanceSqTo(current, eyePosEarly) <= maxDist * maxDist * 1.21F
+         && isValidTargetType(current)) {
+         return current;
+      }
+
       Box searchBox = mc.player.getBoundingBox().expand(maxDist);
       List<LivingEntity> entities = mc.world.getEntitiesByClass(LivingEntity.class, searchBox,
          e -> e != mc.player && e.isAlive() && e.getHealth() > 0.0F);
@@ -362,7 +372,7 @@ public class KillAura extends BaseModule {
                this.lonyJirIsBack = false;
             }
          }
-      } else if (!raytraceToEntity(this.target)) {
+      } else if (this.targetBlocked) {
          this.lonyJirAcceleration += 0.0015F;
       } else if (this.lonyJirAcceleration > 0.0F) {
          this.lonyJirAcceleration -= 0.01F;
@@ -484,7 +494,7 @@ public class KillAura extends BaseModule {
       }
 
       if (candidates.isEmpty()) {
-         return entity.getEyePos();
+         return new Vec3d(entityBox.getCenter().x, MathHelper.clamp(eyePos.y, entityBox.minY, entityBox.maxY), entityBox.getCenter().z);
       }
 
       Vec3d currentRotationVec = mc.player.getRotationVecClient();
@@ -512,9 +522,7 @@ public class KillAura extends BaseModule {
           mc.interactionManager.attackEntity(mc.player, target);
           mc.player.resetLastAttackedTicks();
           mc.player.swingHand(Hand.MAIN_HAND);
-          airTicks = 0;
           lastClickTime = System.currentTimeMillis();
-          attackWatch.reset();
           attackTimer.reset();
           handleSprintPost();
        }
@@ -533,16 +541,7 @@ public class KillAura extends BaseModule {
 
    private boolean isRaytraceBlocked() {
       if (!raytraceCheck.isEnabled()) return false;
-      Vec3d eyePos = mc.player.getEyePos();
-      Vec3d toTarget = target.getBoundingBox().getCenter().subtract(eyePos);
-      RaycastContext ctx = new RaycastContext(
-         eyePos,
-         eyePos.add(toTarget.normalize().multiply(maxDistanceSetting.getCurrentValue())),
-         RaycastContext.ShapeType.COLLIDER,
-         RaycastContext.FluidHandling.NONE,
-         mc.player
-      );
-      return mc.world.raycast(ctx).getType() != HitResult.Type.MISS;
+      return this.targetBlocked;
    }
 
    private boolean isCooldownBlocked() {
@@ -573,11 +572,16 @@ public class KillAura extends BaseModule {
       if (!checkUse.isEnabled()) return false;
       if (mc.player.isUsingItem()) {
          if (mc.player.isBlocking() && unpressShield.isEnabled()) {
-            mc.interactionManager.stopUsingItem(mc.player);
+            if (!this.shieldDisengaged) {
+               mc.interactionManager.stopUsingItem(mc.player);
+               this.shieldDisengaged = true;
+            }
             return false;
          }
          return true;
       }
+
+      this.shieldDisengaged = false;
       return false;
    }
 

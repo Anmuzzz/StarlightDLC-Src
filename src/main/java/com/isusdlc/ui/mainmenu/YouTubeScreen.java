@@ -99,6 +99,7 @@ public class YouTubeScreen extends CustomScreen implements IMinecraft {
         this.searching = true;
         this.status = "Поиск: " + query;
         this.statusTime = System.currentTimeMillis();
+        this.destroyThumbnails();
         this.results.clear();
         this.scroll = 0;
 
@@ -143,7 +144,7 @@ public class YouTubeScreen extends CustomScreen implements IMinecraft {
             }
 
             int beIndex = input.indexOf("youtu.be/");
-            if (beIndex != -1 && input.length() >= beIndex + 19) {
+            if (beIndex != -1 && input.length() >= beIndex + 20) {
                 return input.substring(beIndex + 9, beIndex + 20);
             }
         }
@@ -338,6 +339,19 @@ public class YouTubeScreen extends CustomScreen implements IMinecraft {
 
     @Override
     public void close() {
+        this.destroyThumbnails();
         mc.setScreen(null);
+    }
+
+    private void destroyThumbnails() {
+        for (Identifier id : this.thumbnails.values()) {
+            try {
+                mc.getTextureManager().destroyTexture(id);
+            } catch (Exception ignored) {
+            }
+        }
+
+        this.thumbnails.clear();
+        this.thumbnailLoading.clear();
     }
 }

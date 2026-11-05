@@ -102,6 +102,8 @@ public class TargetESP extends BaseModule {
    private float movingValue;
    private float markerRotationValue;
    private LivingEntity prevTarget;
+   private boolean occluded;
+   private long occludedAt;
    private float chainRotationAngle = 0.0F;
    private final Timer targetLostTimer = new Timer();
    private double ringStep = 0.0;
@@ -152,7 +154,10 @@ public class TargetESP extends BaseModule {
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
             RenderSystem.enableDepthTest();
-            if (mc.world
+            // рейкаст видимости — не чаще 200 мс
+            long nowMs = System.currentTimeMillis();
+            if (nowMs - this.occludedAt > 200L) {
+               this.occluded = mc.world
                   .raycast(
                      new RaycastContext(
                         mc.gameRenderer.getCamera().getPos(),
@@ -163,7 +168,10 @@ public class TargetESP extends BaseModule {
                      )
                   )
                   .getType()
-               != Type.MISS) {
+               != Type.MISS;
+               this.occludedAt = nowMs;
+            }
+            if (this.occluded) {
                RenderSystem.disableDepthTest();
             }
 
@@ -721,9 +729,9 @@ public class TargetESP extends BaseModule {
       ColorRGBA color = this.getTargetColor();
       Vec3d camPos = mc.gameRenderer.getCamera().getPos();
       float radius = target.getWidth() * 0.9F + 0.3F;
-      int cr = (int) (color.getRed() * 255.0F);
-      int cg = (int) (color.getGreen() * 255.0F);
-      int cb = (int) (color.getBlue() * 255.0F);
+      int cr = (int) color.getRed();
+      int cg = (int) color.getGreen();
+      int cb = (int) color.getBlue();
 
       ms.push();
       ms.translate(target.getX() - camPos.x, target.getY() - camPos.y + 0.02, target.getZ() - camPos.z);
@@ -752,9 +760,9 @@ public class TargetESP extends BaseModule {
       ColorRGBA color = this.getTargetColor();
       Vec3d camPos = mc.gameRenderer.getCamera().getPos();
       float radius = target.getWidth() * 0.75F + 0.25F;
-      int cr = (int) (color.getRed() * 255.0F);
-      int cg = (int) (color.getGreen() * 255.0F);
-      int cb = (int) (color.getBlue() * 255.0F);
+      int cr = (int) color.getRed();
+      int cg = (int) color.getGreen();
+      int cb = (int) color.getBlue();
       double phase = System.currentTimeMillis() % 4000L / 4000.0 * Math.PI * 2.0;
 
       ms.push();

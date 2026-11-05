@@ -25,6 +25,20 @@ import net.minecraft.client.gui.screen.ChatScreen;
 
 public class KeyBinds extends HudList {
    int lastSize = -1;
+   private final java.util.Map<Module, RowText> rowTextCache = new java.util.HashMap<>();
+
+   private record RowText(int key, String text) {}
+
+   private String rowText(Module module) {
+      int key = module.getKey();
+      RowText cached = this.rowTextCache.get(module);
+      if (cached == null || cached.key() != key) {
+         cached = new RowText(key, module.getName() + " " + TextUtility.getKeyName(key));
+         this.rowTextCache.put(module, cached);
+      }
+
+      return cached.text();
+   }
    private final BooleanSetting alwaysDisplay = new BooleanSetting(this, "hud.always_display");
 
    public KeyBinds() {
@@ -41,7 +55,7 @@ public class KeyBinds extends HudList {
          module.getKeybindsAnimation().update(forward);
          module.getKeybindsAnimation().setEasing(Easing.BAKEK);
          if (module.getKeybindsAnimation().getValue() > 0.0F) {
-            float textWidth = Fonts.REGULAR.getFont(7.0F).width(module.getName() + " " + TextUtility.getKeyName(module.getKey()));
+            float textWidth = Fonts.REGULAR.getFont(7.0F).width(this.rowText(module));
             this.width = Math.max(textWidth + 45.0F, this.width);
          }
 
@@ -108,7 +122,7 @@ public class KeyBinds extends HudList {
                this.y + offset + GuiUtility.getMiddleOfBox(font.height(), itemHeight),
                Colors.getTextColor().withAlpha(255.0F * alpha)
             );
-            String keyName = TextUtility.getKeyName(module.getKey());
+            String keyName = this.rowText(module).substring(module.getName().length() + 1);
             Font keyFont = Fonts.MEDIUM.getFont(6.5F);
             float keyWidth = keyFont.width(keyName) + 10.0F;
             float keyHeight = 13.0F;

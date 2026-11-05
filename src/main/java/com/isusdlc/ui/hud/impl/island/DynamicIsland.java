@@ -1,5 +1,6 @@
 package com.isusdlc.ui.hud.impl.island;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Generated;
 import com.isusdlc.elegant;
@@ -246,14 +247,26 @@ public class DynamicIsland extends HudElement implements IMinecraft, IScaledReso
       return this.statuses().getLast();
    }
 
+   private final List<IslandStatus> statusCache = new ArrayList<>();
+   private long statusCacheTime;
+   private static final long STATUS_CACHE_MS = 250L;
+
    public List<IslandStatus> statuses() {
-      return this.statuses
-         .getValues()
-         .stream()
-         .filter(islandStatus -> ((IslandStatus)islandStatus).canShow() && islandStatus.isSelected())
-         .map(islandStatus -> (IslandStatus)islandStatus)
-         .toList()
-         .reversed();
+      // вызывается несколько раз за кадр (рендер + боссбар-миксины): кэш на 250 мс
+      long now = System.currentTimeMillis();
+      if (now - this.statusCacheTime > STATUS_CACHE_MS) {
+         this.statusCache.clear();
+         List<SelectSetting.Value> values = this.statuses.getValues();
+         for (int i = values.size() - 1; i >= 0; i--) {
+            IslandStatus status = (IslandStatus) values.get(i);
+            if (status.canShow() && status.isSelected()) {
+               this.statusCache.add(status);
+            }
+         }
+         this.statusCacheTime = now;
+      }
+
+      return this.statusCache;
    }
 
    @Generated

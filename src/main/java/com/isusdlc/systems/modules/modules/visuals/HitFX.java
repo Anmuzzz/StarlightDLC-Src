@@ -102,9 +102,9 @@ public class HitFX extends BaseModule {
             float progress = MathHelper.clamp((float) (now - fx.start) / this.duration.getCurrentValue(), 0.0F, 1.0F);
             float alpha = 1.0F - progress;
             ColorRGBA color = this.color.getColor();
-            int cr = (int) (color.getRed() * 255.0F);
-            int cg = (int) (color.getGreen() * 255.0F);
-            int cb = (int) (color.getBlue() * 255.0F);
+            int cr = (int) color.getRed();
+            int cg = (int) color.getGreen();
+            int cb = (int) color.getBlue();
             Vec3d relPos = fx.target.getLerpedPos(event.getTickDelta()).subtract(camPos);
             float originY = (float) relPos.y + fx.target.getHeight() * 0.6F;
             float sizeMul = this.sizeMultiplier.getCurrentValue();
@@ -212,6 +212,9 @@ public class HitFX extends BaseModule {
          ms.pop();
       }
       BufferRenderer.drawWithGlobalProgram(buffer.end());
+      // возвращаем шейдер/текстуру для последующих POSITION_COLOR-эффектов
+      RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+      RenderSystem.setShaderTexture(0, 0);
    }
 
    /** Короткая вспышка хитбокса цели. */

@@ -58,9 +58,9 @@ public class JumpCircle extends BaseModule {
       Vec3d cam = event.getCamera().getPos();
       var matrices = event.getMatrices();
       ColorRGBA col = color.getColor();
-      int r = (int) (col.getRed() * 255);
-      int g = (int) (col.getGreen() * 255);
-      int b2 = (int) (col.getBlue() * 255);
+      int r = (int) col.getRed();
+      int g = (int) col.getGreen();
+      int b2 = (int) col.getBlue();
       float maxTime = time.getCurrentValue();
 
       matrices.push();

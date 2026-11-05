@@ -23,6 +23,7 @@ import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.item.MaceItem;
 
 public final class EntityUtility implements IMinecraft {
+   private static final java.util.regex.Pattern NON_DIGITS = java.util.regex.Pattern.compile("[^0-9.]");
    private static float timer = 1.0F;
 
    public static void resetTimer() {
@@ -184,7 +185,7 @@ public final class EntityUtility implements IMinecraft {
             if (scoreBoard != null) {
                ReadableScoreboardScore score = ent.getScoreboard().getScore(ent, scoreBoard);
                String text = ReadableScoreboardScore.getFormattedScore(score, scoreBoard.getNumberFormatOr(StyledNumberFormat.EMPTY)).getString();
-               String digits = text.replaceAll("[^0-9.]", "");
+               String digits = NON_DIGITS.matcher(text).replaceAll("");
 
                try {
                   float scoreboardHealth = Float.parseFloat(digits);

@@ -42,6 +42,7 @@ import net.minecraft.client.gui.screen.ChatScreen;
 import ru.kotopushka.compiler.sdk.annotations.CompileBytecode;
 
 public class Hud implements IMinecraft, IScaledResolution {
+   private final java.util.Map<String, HudElement> elementByName = new java.util.HashMap<>();
    private final List<HudElement> elements = new ArrayList<>();
    private final List<Popup> popups = new ArrayList<>();
    public DynamicIsland island;
@@ -206,6 +207,7 @@ public class Hud implements IMinecraft, IScaledResolution {
          );
       for (HudElement element : this.elements) {
          element.setShowing(true);
+         this.elementByName.put(element.getName().toLowerCase(), element);
       }
    }
 
@@ -222,7 +224,7 @@ public class Hud implements IMinecraft, IScaledResolution {
    }
 
    public <T extends HudElement> T getElementByName(String name) {
-      return (T)this.elements.stream().filter(element -> element.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+      return (T)this.elementByName.get(name.toLowerCase());
    }
 
    @Generated

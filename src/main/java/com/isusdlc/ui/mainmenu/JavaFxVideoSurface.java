@@ -139,12 +139,17 @@ public final class JavaFxVideoSurface {
     }
 
     private void ensureStarted() {
-        this.runOnFx(() -> {
+        if (this.jfxPanel != null) {
+            if (!this.fxLoopRunning) {
+                this.startFxLoop();
+            }
+            return;
+        }
+
+        // Swing/AWT-объекты создаются строго на EDT (контракт JFXPanel)
+        javax.swing.SwingUtilities.invokeLater(() -> {
             try {
                 if (this.jfxPanel != null) {
-                    if (!this.fxLoopRunning) {
-                        this.startFxLoop();
-                    }
                     return;
                 }
 

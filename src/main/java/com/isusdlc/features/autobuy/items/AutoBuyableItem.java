@@ -50,11 +50,11 @@ public interface AutoBuyableItem {
                if (type != null && !type.isEmpty()) return true;
             }
             if (nbt.contains("AttributeModifiers", 9)) {
-               NbtList list = nbt.getList("AttributeModifiers", 9);
+               NbtList list = nbt.getList("AttributeModifiers", 10);
                if (!list.isEmpty()) return true;
             }
             if (nbt.contains("RequiredEnchantments", 9)) {
-               NbtList list = nbt.getList("RequiredEnchantments", 9);
+               NbtList list = nbt.getList("RequiredEnchantments", 10);
                if (!list.isEmpty()) return true;
             }
          }

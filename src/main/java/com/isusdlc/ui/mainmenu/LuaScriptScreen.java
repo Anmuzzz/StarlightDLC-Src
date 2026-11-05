@@ -366,10 +366,6 @@ public class LuaScriptScreen extends CustomScreen implements IMinecraft {
     @Override
     public boolean charTyped(char chr, int modifiers) {
         if (this.selectedFile != null) {
-            if (chr == '\t') {
-                this.insert(TAB);
-                return true;
-            }
             if (chr >= 32) {
                 this.insert(String.valueOf(chr));
                 return true;

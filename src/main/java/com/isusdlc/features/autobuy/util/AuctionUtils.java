@@ -94,7 +94,11 @@ public class AuctionUtils {
             Slot var8 = (Slot)var0.get(var7);
             if (var8 != null) {
                ItemStack var9 = var8.getStack();
-               if (var9.isEmpty()) {
+               if (!var9.isEmpty()) {
+                  int price = getPrice(var9);
+                  if (price > 0) {
+                     return price;
+                  }
                }
             }
          }
@@ -260,7 +264,7 @@ public class AuctionUtils {
             }
 
             if (var31.contains("AttributeModifiers", 9)) {
-               NbtList var41 = var31.getList("AttributeModifiers", 9);
+               NbtList var41 = var31.getList("AttributeModifiers", 10);
                if (!var41.isEmpty()) {
                   return compareTalismanByAttributes(var0, var1);
                }
@@ -296,7 +300,7 @@ public class AuctionUtils {
                   if (var45 != null) {
                      NbtCompound var48 = var45.copyNbt();
                      if (var48 != null && var48.contains("AttributeModifiers", 9)) {
-                        NbtList var51 = var48.getList("AttributeModifiers", 9);
+                        NbtList var51 = var48.getList("AttributeModifiers", 10);
                         if (!var51.isEmpty()) {
                            return false;
                         }
@@ -317,7 +321,7 @@ public class AuctionUtils {
          if (var39 != null) {
             NbtCompound var43 = var39.copyNbt();
             if (var43 != null && var43.contains("AttributeModifiers", 9)) {
-               NbtList var46 = var43.getList("AttributeModifiers", 9);
+               NbtList var46 = var43.getList("AttributeModifiers", 10);
                if (!var46.isEmpty()) {
                   var33 = true;
                   return compareTalismanByAttributes(var0, var1);
@@ -330,7 +334,7 @@ public class AuctionUtils {
          if (var47 != null) {
             NbtCompound var50 = var47.copyNbt();
             if (var50 != null && var50.contains("AttributeModifiers", 9)) {
-               NbtList var53 = var50.getList("AttributeModifiers", 9);
+               NbtList var53 = var50.getList("AttributeModifiers", 10);
                if (!var53.isEmpty()) {
                   var44 = true;
                }

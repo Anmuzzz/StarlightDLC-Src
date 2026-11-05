@@ -246,7 +246,7 @@ public final class FunTimePriceParser {
                String var6 = var5.getStack().getName().getString();
                String var7 = AuctionUtils.funTimePricePattern.matcher(var6).replaceAll("").trim();
                String var8 = var7.toLowerCase().trim();
-               boolean var9 = var8.equals(var2) || var8.contains(var2) || var2.contains(var8);
+               boolean var9 = var8.equals(var2) || var8.contains(var2) || !var8.isEmpty() && var2.contains(var8);
                if (var9) {
                   int var10 = AuctionUtils.getPrice(var5.getStack());
                   if (var10 <= 0) {

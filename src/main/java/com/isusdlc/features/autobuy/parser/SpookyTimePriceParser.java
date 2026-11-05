@@ -351,7 +351,24 @@ public final class SpookyTimePriceParser {
    }
 
    private static List<AutoBuyableItem> resolveItemsToParse() {
-      return new ArrayList<>();
+      ArrayList<AutoBuyableItem> items = new ArrayList<>();
+
+      try {
+         for (AutoBuyableItem item : ItemRegistry.getSpookyTime()) {
+            if (item != null && item.isEnabled()) {
+               items.add(item);
+            }
+         }
+      } catch (Exception ignored) {
+      }
+
+      if (!items.isEmpty()) {
+         log("[Parser] Items source=SPOOKYTIME_ENABLED size=" + items.size());
+      } else {
+         log("[Parser] Items source=SPOOKYTIME_ENABLED size=0");
+      }
+
+      return items;
    }
 
    private static int getSpookyTimePrice(ItemStack var0, List<Slot> var1, int var2) {
