@@ -11,7 +11,6 @@ import com.isusdlc.systems.config.ConfigFile;
 import com.isusdlc.systems.config.ConfigManager;
 import com.isusdlc.systems.event.EventIntegration;
 import com.isusdlc.systems.event.EventManager;
-import com.isusdlc.systems.event.handlers.ServerConnectionHandler;
 import com.isusdlc.systems.file.FileManager;
 import com.isusdlc.systems.friends.FriendManager;
 import com.isusdlc.systems.localization.Localizator;
@@ -73,7 +72,6 @@ public enum elegant implements IMinecraft {
    private SwingManager swingManager;
    private TPSHandler tpsHandler;
    private Hud hud;
-   private ServerConnectionHandler serverConnectionHandler;
    private PoshalkoHandler poshalkoHandler;
    private WayPointsManager wayPointsManager;
    private SwingPresetManager swingPresetManager;
@@ -163,7 +161,6 @@ public enum elegant implements IMinecraft {
       DrawUtility.initializeShaders();
       Localizator.loadTranslations();
       this.chatListener = new ChatListener();
-      this.serverConnectionHandler = new ServerConnectionHandler();
       this.poshalkoHandler = new PoshalkoHandler();
       String osName = System.getProperty("os.name");
       String pcName = System.getProperty("user.name");
@@ -346,10 +343,6 @@ public enum elegant implements IMinecraft {
       return this.hud;
    }
 
-   @Generated
-   public ServerConnectionHandler getServerConnectionHandler() {
-      return this.serverConnectionHandler;
-   }
 
    @Generated
    public PoshalkoHandler getPoshalkoHandler() {

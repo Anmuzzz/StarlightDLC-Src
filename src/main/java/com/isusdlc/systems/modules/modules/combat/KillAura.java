@@ -106,6 +106,7 @@ public class KillAura extends BaseModule {
     private Vec3d currentAimPoint;
     private boolean targetBlocked;
     private boolean wasSprinting;
+    private long critWaitStart;
     private boolean shieldDisengaged;
     private boolean stopSprintPacketSent;
 
@@ -151,6 +152,7 @@ public class KillAura extends BaseModule {
 
    @Override
    public void onDisable() {
+      this.critWaitStart = 0L;
       releaseSprint();
       target = null;
       currentAimPoint = null;
@@ -532,7 +534,19 @@ public class KillAura extends BaseModule {
       if (isRaytraceBlocked()) return false;
       if (isCooldownBlocked()) return false;
       if (isPlayerUsingBlocked()) return false;
-      if (critOnly.isSelected() && !hasMovementRestrictions()) return isPlayerInCriticalState();
+      if (critOnly.isSelected() && !hasMovementRestrictions()) {
+         if (isPlayerInCriticalState()) {
+            this.critWaitStart = 0L;
+            return true;
+         }
+
+         // фолбэк: цель в зоне, но крита нет 200 мс — бьём без крита
+         if (this.critWaitStart == 0L) {
+            this.critWaitStart = System.currentTimeMillis();
+         }
+
+         return System.currentTimeMillis() - this.critWaitStart >= 200L;
+      }
       if (critAdaptive.isSelected() && !hasMovementRestrictions()) {
          return mc.player.isOnGround() ? true : isPlayerInCriticalState();
       }

@@ -21,6 +21,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.common.KeepAliveC2SPacket;
 import net.minecraft.util.hit.HitResult;
@@ -111,7 +112,6 @@ public class ElytraTarget extends BaseModule {
 
     private List<Vec3d> airDirections = new ArrayList<>();
     private long fireworkTimer = 0L;
-    public boolean trueFireWork = false;
     private int x, y, z;
 
     private long lastPacketSend = 0L;
@@ -136,9 +136,7 @@ public class ElytraTarget extends BaseModule {
         if (firework.isEnabled()) {
             long now = System.currentTimeMillis();
             if (now - lastFireworkCheck > fireworkTime.getCurrentValue()) {
-                if (trueFireWork) {
-                    inventorySwap(new ItemStack(Items.FIREWORK_ROCKET));
-                }
+                inventorySwap(new ItemStack(Items.FIREWORK_ROCKET));
                 lastFireworkCheck = now;
             }
         }
@@ -281,18 +279,6 @@ public class ElytraTarget extends BaseModule {
         packetBuffer.clear();
     }
 
-    public void onTargetAttack(LivingEntity attacker) {
-        if (attacker != null && attacker.equals(lastTarget)) {
-            targetLastAttackTime = System.currentTimeMillis();
-            if (fakelags.isEnabled()) {
-                sendBufferedPackets();
-                isAccumulatingPackets = false;
-                wasInFarRange = false;
-                defensivePos = null;
-            }
-        }
-    }
-
     @Override
     public void onDisable() {
         sendBufferedPackets();
@@ -309,215 +295,21 @@ public class ElytraTarget extends BaseModule {
         return leaveHP.isEnabled() && (lowHP || usingItem);
     }
 
-    public void nextPhase(LivingEntity target) {
-        lastTarget = target;
-        lastHitTime = System.currentTimeMillis();
-        rotationPhase = 1;
-
-        if (fakelags.isEnabled()) {
-            sendBufferedPackets();
-            isAccumulatingPackets = false;
-            wasInFarRange = false;
-            defensivePos = null;
-        }
-
-        rebuildAirDirections();
-
-        int oldIndexInNew = -1;
-        Vec3d oldDir = null;
-        if (!airDirections.isEmpty() && directionIndex >= 0 && directionIndex < airDirections.size()) {
-            oldDir = airDirections.get(directionIndex);
-        }
-        if (oldDir != null) {
-            for (int i = 0; i < airDirections.size(); i++) {
-                Vec3d v = airDirections.get(i);
-                if (Double.compare(v.x, oldDir.x) == 0 && Double.compare(v.y, oldDir.y) == 0 && Double.compare(v.z, oldDir.z) == 0) {
-                    oldIndexInNew = i;
-                    break;
-                }
-            }
-        }
-
-        int size = airDirections.size();
-        int candidateIndex = (oldIndexInNew == -1) ? 0 : (oldIndexInNew + 1) % size;
-        int attempts = 0;
-        int chosenIndex = candidateIndex;
-
-        while (attempts < size) {
-            Vec3d dir = airDirections.get(candidateIndex);
-            if (resolver.isEnabled() && dir.y < 0 && !mc.player.isGliding()) {
-                candidateIndex = (candidateIndex + 1) % size;
-                attempts++;
-                continue;
-            }
-
-            Vec3d candidatePos = target.getPos().add(dir.normalize().multiply(sila.getCurrentValue()));
-            Vec3d tryBetter = findClosestValidPosAround(candidatePos, 4.5);
-            Vec3d checkPos = tryBetter != null ? tryBetter : new Vec3d(candidatePos.x, Math.max(candidatePos.y, mc.player.getY() + 6), candidatePos.z);
-
-            if (!(avoidWalls.isEnabled() && isObstructed(mc.player.getEyePos(), checkPos)) && isValidFlyPosition(checkPos)) {
-                chosenIndex = candidateIndex;
-                break;
-            }
-
-            candidateIndex = (candidateIndex + 1) % size;
-            attempts++;
-        }
-
-        directionIndex = chosenIndex;
-    }
-
-    public void overtakingElytra(LivingEntity base, boolean attack) {
-        boolean leave = shouldLeave();
-        boolean inEvasion = rotationPhase != 0 || leave;
-
-        Vec3d targetPos = base.getPos().add(0, base.getHeight() / 2.0, 0);
-        Vec3d modifiedPos;
-
-        if (inEvasion) {
-            Vec3d dir = airDirections.get(directionIndex);
-            double strength = sila.getCurrentValue();
-            Vec3d candidatePos = targetPos.add(dir.normalize().multiply(strength));
-            Vec3d tryBetter = findClosestValidPosAround(candidatePos, 10);
-            if (tryBetter != null) {
-                trueFireWork = true;
-                candidatePos = tryBetter;
-            } else {
-                candidatePos = new Vec3d(candidatePos.x, Math.max(candidatePos.y, mc.player.getY() + 2), candidatePos.z);
-            }
-            modifiedPos = candidatePos;
-
-            if (mc.player.getPos().distanceTo(modifiedPos) < 1) {
-                rotationPhase = 0;
-            }
-        } else {
-            double bps = Math.hypot(base.getX() - base.prevX, base.getZ() - base.prevZ) * 20;
-
-            boolean canPredict = perelet.isEnabled() && bps >= 20.0 && !mc.player.isTouchingWater() && !mc.player.isSubmergedInWater();
-
-            if (canPredict) {
-                Vec3d motion = new Vec3d(base.getX() - base.prevX, base.getY() - base.prevY, base.getZ() - base.prevZ);
-                double predictFactor = MathHelper.clamp(predict.getCurrentValue(), 0.2F, 2.5F);
-                Vec3d predicted = motion.multiply(predictFactor * 1.5);
-
-                if (predicted.lengthSquared() < 1.0E-4) {
-                    predicted = base.getRotationVecClient().normalize().multiply(predictFactor);
-                }
-                modifiedPos = base.getPos().add(predicted).add(0, base.getHeight() / 2.0, 0);
-            } else {
-                modifiedPos = base.getPos().add(0, base.getHeight() / 2.0, 0);
-            }
-        }
-
-        double dx = modifiedPos.x - mc.player.getX();
-        double dy = modifiedPos.y - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
-        double dz = modifiedPos.z - mc.player.getZ();
-
-        x = (int) modifiedPos.x;
-        y = (int) modifiedPos.y;
-        z = (int) modifiedPos.z;
-
-        float targetYaw = (float) Math.toDegrees(Math.atan2(dz, dx)) - 90.0F;
-        float targetPitch = (float) -Math.toDegrees(Math.atan2(dy, Math.hypot(dx, dz)));
-
-        rotateSmooth(targetYaw, targetPitch, 1.15f, 140f, 40f);
-    }
-
-    public void targetDefault(LivingEntity base, boolean attack) {
-        Vec3d targetPos = base.getPos();
-        double bps = Math.hypot(base.getX() - base.prevX, base.getZ() - base.prevZ) * 20;
-
-        boolean canPredict = perelet.isEnabled() && bps >= 20.0 && !mc.player.isTouchingWater() && !mc.player.isSubmergedInWater();
-
-        if (canPredict) {
-            Vec3d motion = new Vec3d(base.getX() - base.prevX, base.getY() - base.prevY, base.getZ() - base.prevZ);
-            double predictFactor = MathHelper.clamp(predict.getCurrentValue(), 0.2F, 2.5F);
-            Vec3d predicted = motion.multiply(predictFactor * 1.5);
-
-            if (predicted.lengthSquared() < 1.0E-4) {
-                predicted = base.getRotationVecClient().normalize().multiply(predictFactor);
-            }
-            targetPos = targetPos.add(predicted);
-        }
-
-        double diffX = targetPos.x - mc.player.getX();
-        double diffY = targetPos.y - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
-        double diffZ = targetPos.z - mc.player.getZ();
-
-        x = (int) targetPos.x;
-        y = (int) targetPos.y;
-        z = (int) targetPos.z;
-
-        float yaw = (float) (Math.toDegrees(Math.atan2(diffZ, diffX)) - 90.0f);
-        float pitch = (float) (-Math.toDegrees(Math.atan2(diffY, Math.hypot(diffX, diffZ))));
-
-        rotateSmooth(yaw, pitch, 1.15f, 140f, 40f);
-    }
-
-    private Vec3d findClosestValidPosAround(Vec3d center, double radius) {
-        List<Vec3d> offsets = new ArrayList<>();
-        for (int y = 2; y >= -1; y--) {
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dz = -1; dz <= 1; dz++) {
-                    if (dx == 0 && dz == 0 && y == 0) continue;
-                    offsets.add(new Vec3d(dx, y, dz));
-                }
-            }
-        }
-
-        Vec3d best = null;
-        double bestDist = Double.MAX_VALUE;
-
-        for (Vec3d offset : offsets) {
-            Vec3d candidate = center.add(offset);
-            if (!isValidFlyPosition(candidate)) continue;
-            if (isObstructed(mc.player.getEyePos(), candidate)) continue;
-            double dist = candidate.squaredDistanceTo(center);
-            if (dist < bestDist) {
-                best = candidate;
-                bestDist = dist;
-            }
-        }
-        return best;
-    }
-
-    private boolean isObstructed(Vec3d from, Vec3d to) {
-        return mc.world.raycast(new net.minecraft.world.RaycastContext(
-                from, to,
-                net.minecraft.world.RaycastContext.ShapeType.COLLIDER,
-                net.minecraft.world.RaycastContext.FluidHandling.NONE,
-                mc.player
-        )).getType() != HitResult.Type.MISS;
-    }
-
-    private boolean isValidFlyPosition(Vec3d pos) {
-        Vec3d head = new Vec3d(pos.x, pos.y + mc.player.getHeight(), pos.z);
-        Vec3d feet = new Vec3d(pos.x, pos.y, pos.z);
-        boolean obstructedVertically = mc.world.raycast(new net.minecraft.world.RaycastContext(
-                head, feet,
-                net.minecraft.world.RaycastContext.ShapeType.COLLIDER,
-                net.minecraft.world.RaycastContext.FluidHandling.NONE,
-                mc.player
-        )).getType() != HitResult.Type.MISS;
-
-        int blockX = (int) Math.floor(pos.x);
-        int blockY = (int) Math.floor(pos.y);
-        int blockZ = (int) Math.floor(pos.z);
-
-        boolean isBlockSolid = mc.world.getBlockState(new BlockPos(blockX, blockY, blockZ)).isOpaqueFullCube();
-        int groundY = mc.world.getTopPosition(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING, new BlockPos(blockX, 0, blockZ)).getY();
-
-        boolean belowGround = pos.y < groundY + 1.0;
-
-        return !obstructedVertically && !isBlockSolid && !belowGround;
-    }
-
     private void inventorySwap(ItemStack item) {
-        for (int i = 0; i < mc.player.getInventory().size(); i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
-            if (stack.getItem() == item.getItem()) {
-                mc.player.getInventory().selectedSlot = i < 9 ? i : mc.player.getInventory().selectedSlot;
-                break;
+        // фейерверк в оффхенде — используем сразу
+        if (mc.player.getOffHandStack().getItem() == item.getItem()) {
+            mc.interactionManager.interactItem(mc.player, Hand.OFF_HAND);
+            mc.player.swingHand(Hand.OFF_HAND);
+            return;
+        }
+
+        // иначе ищем в хотбаре: выбор слота + использование (буст пока в полёте)
+        for (int i = 0; i < 9; i++) {
+            if (mc.player.getInventory().getStack(i).getItem() == item.getItem()) {
+                mc.player.getInventory().selectedSlot = i;
+                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                mc.player.swingHand(Hand.MAIN_HAND);
+                return;
             }
         }
     }
@@ -529,11 +321,6 @@ public class ElytraTarget extends BaseModule {
     private void rotate(float yaw, float pitch) {
         Rotation rot = new Rotation(yaw, pitch);
         elegant.getInstance().getRotationHandler().rotate(rot, MoveCorrection.DIRECT, 180f, 180f, 180f, RotationPriority.OVERRIDE);
-    }
-
-    private void rotateSmooth(float yaw, float pitch, float speed, float yawSpeed, float pitchSpeed) {
-        Rotation rot = new Rotation(yaw, pitch);
-        elegant.getInstance().getRotationHandler().rotate(rot, MoveCorrection.DIRECT, yawSpeed, pitchSpeed, speed, RotationPriority.OVERRIDE);
     }
 
     private float getCurrentYaw() {
