@@ -6,6 +6,7 @@ import com.isusdlc.systems.event.impl.game.GameTickEvent;
 import com.isusdlc.systems.modules.modules.combat.NoInteract;
 import com.isusdlc.utility.render.penis.PenisAtlas;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.crash.ReportType;
 import net.minecraft.client.RunArgs;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
@@ -88,6 +89,14 @@ public class MinecraftClientMixin {
          System.err.println("Ошибка при загрузке анимаций: " + var5.getMessage());
          var5.printStackTrace();
       }
+   }
+
+   @Inject(
+      method = {"crash(Lnet/minecraft/util/crash/CrashReport;)V"},
+      at = {@At("HEAD")}
+   )
+   public void onCrash(net.minecraft.util.crash.CrashReport report, CallbackInfo ci) {
+      com.isusdlc.systems.CrashReporter.report(report.asString(ReportType.MINECRAFT_CRASH_REPORT));
    }
 
    @Inject(

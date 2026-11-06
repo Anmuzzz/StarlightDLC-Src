@@ -19,6 +19,8 @@ import com.isusdlc.systems.modules.constructions.swinganim.SwingManager;
 import com.isusdlc.systems.modules.constructions.swinganim.presets.SwingPresetManager;
 import com.isusdlc.systems.modules.listeners.ModuleTickListener;
 import com.isusdlc.systems.modules.listeners.ModuleWidgetRenderer;
+import com.isusdlc.systems.CrashReporter;
+import com.isusdlc.systems.UpdateChecker;
 import com.isusdlc.systems.notifications.NotificationManager;
 import com.isusdlc.systems.poshalko.PoshalkoHandler;
 import com.isusdlc.systems.target.TargetManager;
@@ -144,6 +146,9 @@ public enum elegant implements IMinecraft {
       } else {
          LOGGER.error("Autosave config not found!");
       }
+
+      CrashReporter.install();
+      UpdateChecker.getInstance().startCheck();
 
       ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
          public Identifier getFabricId() {
